@@ -1,0 +1,56 @@
+{% autoescape off %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* Add any additional styles here */
+        .email-container {
+            font-family: Mulish, sans-serif;
+            color: #333333;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .email-content {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #0066cc;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-content">
+            <p>Hello, {{ invited_user }}!</p>
+            <p>You have been invited to create an account by {{ invited_by }} for your internal gh_bball ERP tool.</p>
+            <p>Click the button below to set your new password:</p>
+            <a href="{{ set_account_url }}" class="button" target="_blank">Set Account</a>
+            <p>If clicking the button above doesn't work, please copy and paste the URL below in a new browser window instead.</p>
+            <p><a href="{{ set_account_url }}" target="_blank">{{ set_account_url }}</a></p>
+        </div>
+        {% include "email_footer.html" %}
+    </div>
+</body>
+</html>
+
+{% endautoescape %}

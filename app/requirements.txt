@@ -1,0 +1,98 @@
+python-slugify==8.0.1  # https://github.com/un33k/python-slugify
+Pillow==10.0.0  # https://github.com/python-pillow/Pillow
+argon2-cffi==23.1.0  # https://github.com/hynek/argon2_cffi
+celery==5.2.7
+# django-celery-beat==2.5.0
+redis==5.0.0  # https://github.com/redis/redis-py
+hiredis==2.2.3  # https://github.com/redis/hiredis-py
+requests==2.31.0 # https://pypi.org/project/requests/
+
+# Django
+# ------------------------------------------------------------------------------
+django==4.2.4  # pyup: < 5.0  # https://www.djangoproject.com/
+django-environ==0.10.0  # https://github.com/joke2k/django-environ
+django-model-utils==4.3.1  # https://github.com/jazzband/django-model-utils
+django-crispy-forms==2.0  # https://github.com/django-crispy-forms/django-crispy-forms
+crispy-bootstrap5==0.7  # https://github.com/django-crispy-forms/crispy-bootstrap5
+django-redis==5.3.0  # https://github.com/jazzband/django-redis
+# Django REST Framework
+djangorestframework==3.14.0  # https://github.com/encode/django-rest-framework
+django-cors-headers==4.2.0  # https://github.com/adamchainz/django-cors-headers
+# DRF-spectacular for api documentation
+drf-spectacular==0.26.4  # https://github.com/tfranzel/drf-spectacular
+
+djangorestframework-simplejwt==5.3.0 # https://github.com/jazzband/djangorestframework-simplejwt
+django-quill-editor==0.1.40 # https://github.com/LeeHanYeong/django-quill-editor/
+
+
+
+# -r base.txt
+
+Werkzeug[watchdog]==2.3.7 # https://github.com/pallets/werkzeug
+ipdb==0.13.13  # https://github.com/gotcha/ipdb
+psycopg[binary]==3.1.9  # https://github.com/psycopg/psycopg
+
+# Testing
+# ------------------------------------------------------------------------------
+mypy==1.4.1  # https://github.com/python/mypy
+django-stubs[compatible-mypy]==4.2.3  # https://github.com/typeddjango/django-stubs
+pytest==7.4.0  # https://github.com/pytest-dev/pytest
+pytest-sugar==0.9.7  # https://github.com/Frozenball/pytest-sugar
+djangorestframework-stubs[compatible-mypy]==3.14.2  # https://github.com/typeddjango/djangorestframework-stubs
+
+# Documentation
+# ------------------------------------------------------------------------------
+sphinx==6.2.1  # https://github.com/sphinx-doc/sphinx
+sphinx-autobuild==2021.3.14 # https://github.com/GaretJax/sphinx-autobuild
+
+# Code quality
+# ------------------------------------------------------------------------------
+flake8==6.1.0  # https://github.com/PyCQA/flake8
+flake8-isort==6.0.0  # https://github.com/gforcada/flake8-isort
+coverage==7.3.0  # https://github.com/nedbat/coveragepy
+black==23.7.0  # https://github.com/psf/black
+djlint==1.32.1  # https://github.com/Riverside-Healthcare/djLint
+pylint-django==2.5.3  # https://github.com/PyCQA/pylint-django
+pre-commit==3.3.3  # https://github.com/pre-commit/pre-commit
+
+# Django
+# ------------------------------------------------------------------------------
+factory-boy==3.3.0  # https://github.com/FactoryBoy/factory_boy
+
+django-debug-toolbar==4.2.0  # https://github.com/jazzband/django-debug-toolbar
+django-extensions==3.2.3  # https://github.com/django-extensions/django-extensions
+django-coverage-plugin==3.1.0  # https://github.com/nedbat/django_coverage_plugin
+pytest-django==4.5.2  # https://github.com/pytest-dev/pytest-django
+# Django Filters
+django-filter==23.3 # https://pypi.org/project/django-filter/
+
+certifi==2023.7.22
+
+django-import-export==4.0.7 # https://pypi.org/project/django-import-export/
+
+
+
+# PRECAUTION: avoid production dependencies that aren't in development
+
+#-r base.txt
+gunicorn==21.2.0  # https://github.com/benoitc/gunicorn
+psycopg[c]==3.1.9  # https://github.com/psycopg/psycopg
+Collectfast==2.2.0  # https://github.com/antonagestam/collectfast
+sentry-sdk==1.29.2  # https://github.com/getsentry/sentry-python
+
+# Django
+# ------------------------------------------------------------------------------
+django-storages[boto3]==1.13.2  # https://github.com/jschneier/django-storages
+django-anymail[amazon-ses]==10.1  # https://github.com/anymail/django-anymail
+
+
+
+boto3==1.28.69 # https://pypi.org/project/boto3/
+
+# django-polymorphic==3.1.0 # https://pypi.org/project/django-polymorphic/
+# openpyxl==3.1.2 # https://pypi.org/project/openpyxl/
+
+# for unit testing
+model-bakery==1.17.0
+pytz==2023.4
+pytest-cov==4.1.0

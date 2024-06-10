@@ -1,0 +1,120 @@
+# models.py
+from django.db import models
+
+class Team(models.Model):
+    name = models.CharField(max_length=100)
+    hex_color = models.CharField(max_length=255, null=True)
+    wins = models.PositiveIntegerField(default=0)
+    losses = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.name
+
+class Game(models.Model):
+    game_number = models.PositiveIntegerField(null=True)
+
+    date = models.DateTimeField(null=True)
+    home_team = models.ForeignKey(Team, related_name='home_games', on_delete=models.CASCADE)
+    away_team = models.ForeignKey(Team, related_name='away_games', on_delete=models.CASCADE)
+    home_team_score = models.PositiveIntegerField(default=0)
+    away_team_score = models.PositiveIntegerField(default=0)
+    winner = models.ForeignKey(Team, related_name='won_games', on_delete=models.SET_NULL, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.home_team_score > self.away_team_score:
+            self.winner = self.home_team
+        elif self.away_team_score > self.home_team_score:
+            self.winner = self.away_team
+        else:
+            self.winner = None
+        super().save(*args, **kwargs)
+
+
+class Player(models.Model):
+    name = models.CharField(max_length=255, null=True)
+    jersey_number = models.IntegerField(null=True)
+    position = models.CharField(max_length=255, null=True)
+    team = models.ForeignKey(Team, related_name='players', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
+    @property
+    def total_two_point_fg(self):
+        return self.statistics.aggregate(total_two_point_fg=Sum('two_point_fg'))['total_two_point_fg'] or 0
+
+    @property
+    def total_three_point_fg(self):
+        return self.statistics.aggregate(total_three_point_fg=Sum('three_point_fg'))['total_three_point_fg'] or 0
+
+    @property
+    def total_free_throw_fg(self):
+        return self.statistics.aggregate(total_free_throw_fg=Sum('free_throw_fg'))['total_free_throw_fg'] or 0
+
+    @property
+    def total_points(self):
+        stats = self.statistics.aggregate(
+            total_two_point_fg=Sum('two_point_fg'),
+            total_three_point_fg=Sum('three_point_fg'),
+            total_free_throw_fg=Sum('free_throw_fg')
+        )
+        total_two_point_fg = stats['total_two_point_fg'] or 0
+        total_three_point_fg = stats['total_three_point_fg'] or 0
+        total_free_throw_fg = stats['total_free_throw_fg'] or 0
+        return (total_two_point_fg * 2) + (total_three_point_fg * 3) + total_free_throw_fg
+
+    @property
+    def total_rebounds(self):
+        stats = self.statistics.aggregate(
+            total_offensive_rebounds=Sum('offensive_rebounds'),
+            total_defensive_rebounds=Sum('defensive_rebounds')
+        )
+        total_offensive_rebounds = stats['total_offensive_rebounds'] or 0
+        total_defensive_rebounds = stats['total_defensive_rebounds'] or 0
+        return total_offensive_rebounds + total_defensive_rebounds
+
+    @property
+    def total_assists(self):
+        return self.statistics.aggregate(total_assists=Sum('assists'))['total_assists'] or 0
+
+    @property
+    def total_steals(self):
+        return self.statistics.aggregate(total_steals=Sum('steals'))['total_steals'] or 0
+
+    @property
+    def total_blocks(self):
+        return self.statistics.aggregate(total_blocks=Sum('blocks'))['total_blocks'] or 0
+
+    @property
+    def total_fouls(self):
+        return self.statistics.aggregate(total_fouls=Sum('fouls'))['total_fouls'] or 0
+
+class PlayerStatistics(models.Model):
+    player = models.ForeignKey(Player, related_name='statistics', on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, related_name='player_statistics', on_delete=models.CASCADE)
+
+    two_point_fg = models.PositiveIntegerField(default=0)
+    three_point_fg = models.PositiveIntegerField(default=0)
+    free_throw_fg = models.PositiveIntegerField(default=0)
+
+    offensive_rebounds = models.PositiveIntegerField(default=0)
+    defensive_rebounds = models.PositiveIntegerField(default=0)
+
+    assists = models.PositiveIntegerField(default=0)
+    steals = models.PositiveIntegerField(default=0)
+    blocks = models.PositiveIntegerField(default=0)
+    fouls = models.PositiveIntegerField(default=0)
+
+    @property
+    def total_points(self):
+        return (self.two_point_fg * 2) + (self.three_point_fg * 3) + self.free_throw_fg
+
+    @property
+    def total_rebounds(self):
+        return self.offensive_rebounds + self.defensive_rebounds
+
+    class Meta:
+        unique_together = ('player', 'game')
+
+    def __str__(self):
+        return f"{self.player} - {self.game}"
