@@ -1,8 +1,9 @@
 # models.py
 from django.db import models
+from django.db.models import Sum
 
 class Team(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     hex_color = models.CharField(max_length=255, null=True)
     wins = models.PositiveIntegerField(default=0)
     losses = models.PositiveIntegerField(default=0)
@@ -37,7 +38,7 @@ class Player(models.Model):
     team = models.ForeignKey(Team, related_name='players', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.name} {self.jersey_number}"
 
     @property
     def total_two_point_fg(self):
