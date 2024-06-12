@@ -46,7 +46,7 @@ class PlayerCSVUploadViewSet(viewsets.ViewSet):
 
 
 class TeamViewSet(viewsets.ModelViewSet):
-    queryset = Team.objects.all()
+    queryset = Team.objects.all().order_by('-wins', 'losses')
     serializer_class = TeamWithGamesSerializer
     permission_classes = []
     http_method_names = ['get']
