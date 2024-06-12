@@ -142,7 +142,8 @@ class TeamWithGamesSerializer(serializers.ModelSerializer):
         home_games = obj.home_games.all()
         away_games = obj.away_games.all()
         all_games = list(home_games) + list(away_games)
-        return GameSerializer(all_games, many=True).data
+        sorted_games = sorted(all_games, key=lambda game: game.game_number)  # Sort by game number
+        return GameSerializer(sorted_games, many=True).data
 
 class PlayerCSVSerializer(serializers.Serializer):
     name = serializers.CharField()
