@@ -71,6 +71,7 @@ class PlayerStatisticsViewSet(viewsets.ModelViewSet):
 
 
 class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
+    permission_classes = []
     parser_classes = [MultiPartParser, FormParser]
 
     def create(self, request):
