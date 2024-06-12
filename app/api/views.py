@@ -5,6 +5,12 @@ from .serializers import TeamSerializer, PlayerSerializer, GameSerializer, GameW
 from .serializers import PlayerStatisticsSerializer, PlayerCSVSerializer, TeamWithGamesSerializer
 from rest_framework.decorators import action
 
+from rest_framework.parsers import FileUploadParser
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.views import APIView
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
 from rest_framework import viewsets
 from rest_framework.response import Response
 import csv
@@ -62,3 +68,45 @@ class PlayerStatisticsViewSet(viewsets.ModelViewSet):
     serializer_class = PlayerStatisticsSerializer
     permission_classes = []
     http_method_names = ['get']
+
+
+class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
+    parser_classes = [MultiPartParser, FormParser]
+
+    def create(self, request):
+        file_obj = request.FILES.get('file')
+        if not file_obj:
+            return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
+
+        decoded_file = file_obj.read().decode('utf-8').splitlines()
+
+        csv_reader = csv.reader(decoded_file)
+        next(csv_reader)  # Skip header row
+
+        for row in csv_reader:
+            player_name, game_number, two_point_fg, three_point_fg, free_throw_fg, defensive_rebounds, assists, steals, blocks, fouls = row
+
+            if not game_number:
+                continue  # Skip entry if game number is blank
+
+            # Get or create player
+            player, _ = Player.objects.get_or_create(name=player_name)
+
+            # Get or create game
+            game, _ = Game.objects.get_or_create(game_number=game_number)
+
+            # Create player statistics
+            PlayerStatistics.objects.create(
+                player=player,
+                game=game,
+                two_point_fg=two_point_fg,
+                three_point_fg=three_point_fg,
+                free_throw_fg=free_throw_fg,
+                defensive_rebounds=defensive_rebounds,
+                assists=assists,
+                steals=steals,
+                blocks=blocks,
+                fouls=fouls
+            )
+
+        return Response({'message': 'CSV file uploaded successfully'}, status=status.HTTP_201_CREATED)
