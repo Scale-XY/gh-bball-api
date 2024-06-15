@@ -58,7 +58,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
 
 class GameViewSet(viewsets.ModelViewSet):
-    queryset = Game.objects.all()
+    queryset = Game.objects.all().order_by('game_number')
     serializer_class = GameWithStatsSerializer
     permission_classes = []
     http_method_names = ['get']
