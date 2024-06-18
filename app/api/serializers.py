@@ -56,6 +56,12 @@ class PlayerSerializer(serializers.ModelSerializer):
     total_blocks = serializers.SerializerMethodField()
     total_fouls = serializers.SerializerMethodField()
 
+    average_points_per_game = serializers.SerializerMethodField()
+    average_rebounds_per_game = serializers.SerializerMethodField()
+    average_assists_per_game = serializers.SerializerMethodField()
+    average_blocks_per_game = serializers.SerializerMethodField()
+    average_steals_per_game = serializers.SerializerMethodField()
+
     team = TeamSerializer()
 
     class Meta:
@@ -63,7 +69,9 @@ class PlayerSerializer(serializers.ModelSerializer):
         fields = ['name', 'jersey_number', 'position', 'team',
                   'total_two_point_fg', 'total_three_point_fg', 'total_free_throw_fg',
                   'total_points', 'total_rebounds', 'total_assists', 'total_steals',
-                  'total_blocks', 'total_fouls']
+                  'total_blocks', 'total_fouls',
+                  'average_points_per_game', 'average_rebounds_per_game', 'average_assists_per_game',
+                  'average_blocks_per_game', 'average_steals_per_game']
 
     def get_total_two_point_fg(self, obj):
         return obj.total_two_point_fg

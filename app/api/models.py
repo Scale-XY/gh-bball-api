@@ -90,6 +90,46 @@ class Player(models.Model):
     def total_fouls(self):
         return self.statistics.aggregate(total_fouls=Sum('fouls'))['total_fouls'] or 0
 
+    @property
+    def average_points_per_game(self):
+        total_games = self.statistics.count()
+        if total_games > 0:
+            return self.total_points / total_games
+        else:
+            return 0
+
+    @property
+    def average_rebounds_per_game(self):
+        total_games = self.statistics.count()
+        if total_games > 0:
+            return self.total_rebounds / total_games
+        else:
+            return 0
+
+    @property
+    def average_assists_per_game(self):
+        total_games = self.statistics.count()
+        if total_games > 0:
+            return self.total_assists / total_games
+        else:
+            return 0
+
+    @property
+    def average_blocks_per_game(self):
+        total_games = self.statistics.count()
+        if total_games > 0:
+            return self.total_blocks / total_games
+        else:
+            return 0
+
+    @property
+    def average_steals_per_game(self):
+        total_games = self.statistics.count()
+        if total_games > 0:
+            return self.total_steals / total_games
+        else:
+            return 0
+
 class PlayerStatistics(models.Model):
     player = models.ForeignKey(Player, related_name='statistics', on_delete=models.CASCADE)
     game = models.ForeignKey(Game, related_name='player_statistics', on_delete=models.CASCADE)
