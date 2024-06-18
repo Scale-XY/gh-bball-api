@@ -90,7 +90,7 @@ class Player(models.Model):
     def total_fouls(self):
         return self.statistics.aggregate(total_fouls=Sum('fouls'))['total_fouls'] or 0
 
-   @property
+    @property
     def average_points_per_game(self):
         total_games = self.statistics.count()
         if total_games > 0:
