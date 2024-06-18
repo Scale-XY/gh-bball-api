@@ -100,6 +100,20 @@ class PlayerSerializer(serializers.ModelSerializer):
     def get_total_fouls(self, obj):
         return obj.total_fouls
 
+    def get_average_points_per_game(self, obj):
+        return obj.average_points_per_game
+
+    def get_average_rebounds_per_game(self, obj):
+        return obj.average_rebounds_per_game
+
+    def get_average_assists_per_game(self, obj):
+        return obj.average_assists_per_game
+
+    def get_average_blocks_per_game(self, obj):
+        return obj.average_blocks_per_game
+
+    def get_average_steals_per_game(self, obj):
+        return obj.average_steals_per_game
 
 
 class GameSerializer(serializers.ModelSerializer):
