@@ -111,3 +111,38 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
             )
 
         return Response({'message': 'CSV file uploaded successfully'}, status=status.HTTP_201_CREATED)
+
+
+class TopPlayersViewSet(viewsets.ViewSet):
+    permission_classes = []
+    queryset = Player.objects.all()
+
+    def top_points_per_game(self, request):
+        top_players = self.queryset.order_by('-average_points_per_game')[:10]
+        serializer = PlayerSerializer(top_players, many=True)
+        return Response(serializer.data)
+
+    def top_rebounds_per_game(self, request):
+        top_players = self.queryset.order_by('-average_rebounds_per_game')[:10]
+        serializer = PlayerSerializer(top_players, many=True)
+        return Response(serializer.data)
+
+    def top_assists_per_game(self, request):
+        top_players = self.queryset.order_by('-average_assists_per_game')[:10]
+        serializer = PlayerSerializer(top_players, many=True)
+        return Response(serializer.data)
+
+    def top_three_point_fg(self, request):
+        top_players = self.queryset.order_by('-total_three_point_fg')[:10]
+        serializer = PlayerSerializer(top_players, many=True)
+        return Response(serializer.data)
+
+    def top_blocks_per_game(self, request):
+        top_players = self.queryset.order_by('-total_blocks')[:10]
+        serializer = PlayerSerializer(top_players, many=True)
+        return Response(serializer.data)
+
+    def top_steals_per_game(self, request):
+        top_players = self.queryset.order_by('-total_steals')[:10]
+        serializer = PlayerSerializer(top_players, many=True)
+        return Response(serializer.data)
