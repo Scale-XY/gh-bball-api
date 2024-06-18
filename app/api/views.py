@@ -70,6 +70,10 @@ class GameViewSet(viewsets.ModelViewSet):
     permission_classes = []
     http_method_names = ['get']
 
+    @method_decorator(cache_page(86400))  # Cache for 1 day (86400 seconds)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 class PlayerStatisticsViewSet(viewsets.ModelViewSet):
     queryset = PlayerStatistics.objects.all()
     serializer_class = PlayerStatisticsSerializer
