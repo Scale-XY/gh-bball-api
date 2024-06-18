@@ -60,6 +60,10 @@ class PlayerViewSet(viewsets.ModelViewSet):
     permission_classes = []
     http_method_names = ['get']
 
+    @method_decorator(cache_page(86400))  # Cache for 1 day (86400 seconds)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 class GameViewSet(viewsets.ModelViewSet):
     queryset = Game.objects.all().order_by('game_number')
     serializer_class = GameWithStatsSerializer
@@ -71,6 +75,10 @@ class PlayerStatisticsViewSet(viewsets.ModelViewSet):
     serializer_class = PlayerStatisticsSerializer
     permission_classes = []
     http_method_names = ['get']
+
+    @method_decorator(cache_page(86400))  # Cache for 1 day (86400 seconds)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class UploadPlayerStatisticsViewSet(viewsets.ViewSet):

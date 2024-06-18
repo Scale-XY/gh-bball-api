@@ -1,6 +1,16 @@
 from django.contrib import admin
 from .models import Team, Game, Player, PlayerStatistics
 
+# In your app's admin.py file
+from django.core.cache import cache
+
+def clear_cache(modeladmin, request, queryset):
+    cache.clear()
+
+clear_cache.short_description = "Clear cache"
+
+admin.site.add_action(clear_cache, "clear_cache")
+
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     list_display = ('name', 'hex_color', 'wins', 'losses')
