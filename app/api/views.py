@@ -115,28 +115,30 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
 
 class TopPlayersViewSet(viewsets.ViewSet):
     permission_classes = []
-    queryset = Player.objects.all()
-
+    
     def list(self, request):
-        top_points = self.queryset.order_by('-average_points_per_game')[:10]
-        top_rebounds = self.queryset.order_by('-average_rebounds_per_game')[:10]
-        top_assists = self.queryset.order_by('-average_assists_per_game')[:10]
-        top_three_point_fg = self.queryset.order_by('-total_three_point_fg')[:10]
-        top_blocks = self.queryset.order_by('-total_blocks')[:10]
-        top_steals = self.queryset.order_by('-total_steals')[:10]
+        top_points_per_game = self.get_top_players_by_stat('average_points_per_game', 10)
+        top_rebounds_per_game = self.get_top_players_by_stat('average_rebounds_per_game', 10)
+        top_assists_per_game = self.get_top_players_by_stat('average_assists_per_game', 10)
+        top_three_points_made = self.get_top_players_by_stat('total_three_point_fg', 10)
+        top_blocks_per_game = self.get_top_players_by_stat('average_blocks_per_game', 10)
+        top_steals_per_game = self.get_top_players_by_stat('average_steals_per_game', 10)
 
-        serializer_points = PlayerSerializer(top_points, many=True)
-        serializer_rebounds = PlayerSerializer(top_rebounds, many=True)
-        serializer_assists = PlayerSerializer(top_assists, many=True)
-        serializer_three_point_fg = PlayerSerializer(top_three_point_fg, many=True)
-        serializer_blocks = PlayerSerializer(top_blocks, many=True)
-        serializer_steals = PlayerSerializer(top_steals, many=True)
+        data = {
+            'top_points_per_game': PlayerSerializer(top_points_per_game, many=True).data,
+            'top_rebounds_per_game': PlayerSerializer(top_rebounds_per_game, many=True).data,
+            'top_assists_per_game': PlayerSerializer(top_assists_per_game, many=True).data,
+            'top_three_points_made': PlayerSerializer(top_three_points_made, many=True).data,
+            'top_blocks_per_game': PlayerSerializer(top_blocks_per_game, many=True).data,
+            'top_steals_per_game': PlayerSerializer(top_steals_per_game, many=True).data,
+        }
 
-        return Response({
-            'top_points_per_game': serializer_points.data,
-            'top_rebounds_per_game': serializer_rebounds.data,
-            'top_assists_per_game': serializer_assists.data,
-            'top_three_point_fg': serializer_three_point_fg.data,
-            'top_blocks_per_game': serializer_blocks.data,
-            'top_steals_per_game': serializer_steals.data,
-        })
+        return Response(data)
+
+    def get_top_players_by_stat(self, stat_field, limit):
+        """
+        Helper method to retrieve top players based on a statistic field and limit.
+        """
+        ordering = '-' + stat_field  # We want descending order for most stats
+        queryset = Player.objects.annotate(**{stat_field: models.F(stat_field)}).order_by(ordering)[:limit]
+        return queryset
