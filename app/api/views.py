@@ -118,18 +118,25 @@ class TopPlayersViewSet(viewsets.ViewSet):
     queryset = Player.objects.all()
 
     def list(self, request):
-        top_players = {
-            'top_points_per_game': self.get_top_players('average_points_per_game'),
-            'top_rebounds_per_game': self.get_top_players('average_rebounds_per_game'),
-            'top_assists_per_game': self.get_top_players('average_assists_per_game'),
-            'top_three_point_fg': self.get_top_players('total_three_point_fg'),
-            'top_blocks_per_game': self.get_top_players('total_blocks'),
-            'top_steals_per_game': self.get_top_players('total_steals'),
-        }
+        top_points = self.queryset.order_by('-average_points_per_game')[:10]
+        top_rebounds = self.queryset.order_by('-average_rebounds_per_game')[:10]
+        top_assists = self.queryset.order_by('-average_assists_per_game')[:10]
+        top_three_point_fg = self.queryset.order_by('-total_three_point_fg')[:10]
+        top_blocks = self.queryset.order_by('-total_blocks')[:10]
+        top_steals = self.queryset.order_by('-total_steals')[:10]
 
-        return Response(top_players)
+        serializer_points = PlayerSerializer(top_points, many=True)
+        serializer_rebounds = PlayerSerializer(top_rebounds, many=True)
+        serializer_assists = PlayerSerializer(top_assists, many=True)
+        serializer_three_point_fg = PlayerSerializer(top_three_point_fg, many=True)
+        serializer_blocks = PlayerSerializer(top_blocks, many=True)
+        serializer_steals = PlayerSerializer(top_steals, many=True)
 
-    def get_top_players(self, field_name):
-        top_players = self.queryset.order_by(f'-{field_name}')[:10]
-        serializer = PlayerSerializer(top_players, many=True)
-        return serializer.data
+        return Response({
+            'top_points_per_game': serializer_points.data,
+            'top_rebounds_per_game': serializer_rebounds.data,
+            'top_assists_per_game': serializer_assists.data,
+            'top_three_point_fg': serializer_three_point_fg.data,
+            'top_blocks_per_game': serializer_blocks.data,
+            'top_steals_per_game': serializer_steals.data,
+        })
