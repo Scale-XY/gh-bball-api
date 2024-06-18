@@ -5,6 +5,9 @@ from .serializers import TeamSerializer, PlayerSerializer, GameSerializer, GameW
 from .serializers import PlayerStatisticsSerializer, PlayerCSVSerializer, TeamWithGamesSerializer
 from rest_framework.decorators import action
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+
 from rest_framework.parsers import FileUploadParser
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
@@ -115,7 +118,8 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
 
 class TopPlayersViewSet(viewsets.ViewSet):
     permission_classes = []
-    
+
+    @method_decorator(cache_page(86400))  # Cache for 1 day (86400 seconds)
     def list(self, request):
         players = Player.objects.all()  # Fetch all players
 

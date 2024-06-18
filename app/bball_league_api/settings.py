@@ -273,6 +273,9 @@ LOGGING = {
 # -------------------------------------------------------------------------------
 # django-rest-framework - https://www.django-rest-framework.org/api-guide/settings/
 REST_FRAMEWORK = {
+    'DEFAULT_CACHE_BACKEND': 'default',
+    'DEFAULT_CACHE_TIMEOUT': 86400,  # Cache timeout in seconds (1 day)
+    
     'COERCE_DECIMAL_TO_STRING': False,
     "DEFAULT_AUTHENTICATION_CLASSES": (
         # "rest_framework.authentication.SessionAuthentication",
@@ -304,6 +307,16 @@ SPECTACULAR_SETTINGS = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',  # Use local memory caching
+        # 'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',  # Use file-based caching
+        # 'LOCATION': '/path/to/cache/directory',  # Specify the path for file-based caching if chosen
+    }
+}
+
 
 from datetime import timedelta
 
