@@ -90,11 +90,11 @@ class Player(models.Model):
     def total_fouls(self):
         return self.statistics.aggregate(total_fouls=Sum('fouls'))['total_fouls'] or 0
 
-    @property
+   @property
     def average_points_per_game(self):
         total_games = self.statistics.count()
         if total_games > 0:
-            return self.total_points / total_games
+            return round(self.total_points / total_games, 1)
         else:
             return 0
 
@@ -102,7 +102,7 @@ class Player(models.Model):
     def average_rebounds_per_game(self):
         total_games = self.statistics.count()
         if total_games > 0:
-            return self.total_rebounds / total_games
+            return round(self.total_rebounds / total_games, 1)
         else:
             return 0
 
@@ -110,7 +110,7 @@ class Player(models.Model):
     def average_assists_per_game(self):
         total_games = self.statistics.count()
         if total_games > 0:
-            return self.total_assists / total_games
+            return round(self.total_assists / total_games, 1)
         else:
             return 0
 
@@ -118,7 +118,7 @@ class Player(models.Model):
     def average_blocks_per_game(self):
         total_games = self.statistics.count()
         if total_games > 0:
-            return self.total_blocks / total_games
+            return round(self.total_blocks / total_games, 1)
         else:
             return 0
 
@@ -126,7 +126,7 @@ class Player(models.Model):
     def average_steals_per_game(self):
         total_games = self.statistics.count()
         if total_games > 0:
-            return self.total_steals / total_games
+            return round(self.total_steals / total_games, 1)
         else:
             return 0
 
