@@ -60,7 +60,6 @@ class PlayerViewSet(viewsets.ModelViewSet):
     permission_classes = []
     http_method_names = ['get']
 
-    @method_decorator(cache_page(10800))  # Cache for 3 hours (10800 seconds)
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
@@ -70,7 +69,6 @@ class GameViewSet(viewsets.ModelViewSet):
     permission_classes = []
     http_method_names = ['get']
 
-    @method_decorator(cache_page(10800))  # Cache for 3 hours (10800 seconds)
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
@@ -80,7 +78,6 @@ class PlayerStatisticsViewSet(viewsets.ModelViewSet):
     permission_classes = []
     http_method_names = ['get']
 
-    @method_decorator(cache_page(10800))  # Cache for 3 hours (10800 seconds)
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
@@ -131,7 +128,6 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
 class TopPlayersViewSet(viewsets.ViewSet):
     permission_classes = []
 
-    @method_decorator(cache_page(10800))  # Cache for 3 hours (10800 seconds)
     def list(self, request):
         players = Player.objects.all()  # Fetch all players
 
