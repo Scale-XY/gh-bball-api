@@ -19,8 +19,6 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 import csv
 
-from django.db.models import F, Value, CharField, Case, When
-
 class PlayoffTeamsViewSet(viewsets.ModelViewSet):
     queryset = Game.objects.exclude(game_number__isnull=False).order_by('date')
     serializer_class = GameSerializer
@@ -76,13 +74,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 class GameViewSet(viewsets.ModelViewSet):
-    queryset = Game.objects.annotate(
-        effective_game_number=Case(
-            When(game_number__isnull=True, then=F('playoff_game')),
-            default=F('game_number'),
-            output_field=CharField(),
-        )
-    ).order_by('-date')
+    queryset = Game.objects.all().order_by('-date')
     serializer_class = GameWithStatsSerializer
     permission_classes = []
     http_method_names = ['get']
