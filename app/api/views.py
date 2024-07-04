@@ -21,7 +21,7 @@ import csv
 
 class PlayoffTeamsViewSet(viewsets.ModelViewSet):
     queryset = Game.objects.exclude(game_number__isnull=False).order_by('date')
-    serializer_class = GameWithStatsSerializer
+    serializer_class = GameSerializer
     permission_classes = []
     http_method_names = ['get']
 
