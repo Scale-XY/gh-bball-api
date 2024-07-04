@@ -23,7 +23,7 @@ class PlayoffTeamsViewSet(viewsets.ViewSet):
     permission_classes = []
 
     def list(self, request):
-        playoff_stages = ['QF1', 'QF2', 'SF', 'F']
+        playoff_stages = ['QF1', 'QF2', 'SF1', 'SF2', 'F']
         playoff_teams = {}
 
         for stage in playoff_stages:
