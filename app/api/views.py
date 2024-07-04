@@ -18,6 +18,23 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 import csv
 
+class PlayoffTeamsViewSet(viewsets.ViewSet):
+    permission_classes = []
+
+    def list(self, request):
+        playoff_stages = ['QF1', 'QF2', 'SF', 'F']
+        playoff_teams = {}
+
+        for stage in playoff_stages:
+            games = Game.objects.filter(playoff_game=stage)
+            teams = set()
+            for game in games:
+                teams.add(game.home_team)
+                teams.add(game.away_team)
+            playoff_teams[stage] = TeamSerializer(list(teams), many=True).data
+
+        return Response(playoff_teams)
+
 class PlayerCSVUploadViewSet(viewsets.ViewSet):
     permission_classes = []
 
@@ -64,7 +81,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 class GameViewSet(viewsets.ModelViewSet):
-    queryset = Game.objects.all().order_by('game_number')
+    queryset = Game.objects.exclude(game_number__isnull=False).order_by('game_number')
     serializer_class = GameWithStatsSerializer
     permission_classes = []
     http_method_names = ['get']
@@ -73,7 +90,7 @@ class GameViewSet(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 class PlayerStatisticsViewSet(viewsets.ModelViewSet):
-    queryset = PlayerStatistics.objects.all()
+    queryset = PlayerStatistics.objects.exclude(game__playoff_game__isnull=False).all()
     serializer_class = PlayerStatisticsSerializer
     permission_classes = []
     http_method_names = ['get']
@@ -129,7 +146,7 @@ class TopPlayersViewSet(viewsets.ViewSet):
     permission_classes = []
 
     def list(self, request):
-        players = Player.objects.all()  # Fetch all players
+        players = Player.objects.exclude(playerstatistics__game__playoff_game__isnull=False).all()  # Fetch all players
 
         # Sort players based on different statistics using lambda functions
         top_points_per_game = sorted(players, key=lambda p: -p.average_points_per_game)[:10]

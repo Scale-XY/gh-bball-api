@@ -12,6 +12,19 @@ class Team(models.Model):
         return self.name
 
 class Game(models.Model):
+    QUARTER_FINAL_1 = 'QF1'
+    QUARTER_FINAL_2 = 'QF2'
+    SEMI_FINAL = 'SF'
+    FINAL = 'F'
+    PLAYOFF_CHOICES = [
+        (QUARTER_FINAL_1, 'Quarterfinal 1'),
+        (QUARTER_FINAL_2, 'Quarterfinal 2'),
+        (SEMI_FINAL, 'Semifinal'),
+        (FINAL, 'Final'),
+    ]
+
+    playoff_game = models.CharField(max_length=3, choices=PLAYOFF_CHOICES, null=True, blank=True)
+    
     game_number = models.PositiveIntegerField(null=True)
 
     date = models.DateTimeField(null=True)
