@@ -14,12 +14,14 @@ class Team(models.Model):
 class Game(models.Model):
     QUARTER_FINAL_1 = 'QF1'
     QUARTER_FINAL_2 = 'QF2'
-    SEMI_FINAL = 'SF'
+    SEMI_FINAL_1 = 'SF1'
+    SEMI_FINAL_2 = 'SF2'
     FINAL = 'F'
     PLAYOFF_CHOICES = [
         (QUARTER_FINAL_1, 'Quarterfinal 1'),
         (QUARTER_FINAL_2, 'Quarterfinal 2'),
-        (SEMI_FINAL, 'Semifinal'),
+        (SEMI_FINAL_1, 'Semifinal 1'),
+        (SEMI_FINAL_2, 'Semifinal 2'),
         (FINAL, 'Final'),
     ]
 
