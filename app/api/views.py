@@ -3,6 +3,7 @@ from rest_framework import viewsets
 from .models import Team, Player, Game, PlayerStatistics
 from .serializers import TeamSerializer, PlayerSerializer, GameSerializer, GameWithStatsSerializer
 from .serializers import PlayerStatisticsSerializer, PlayerCSVSerializer, TeamWithGamesSerializer
+from .serializers import PlayerPlayoffsSerializer
 from rest_framework.decorators import action
 
 from django.utils.decorators import method_decorator
@@ -185,12 +186,12 @@ class TopPlayoffsPlayersViewSet(viewsets.ViewSet):
         top_steals_per_game = sorted(players, key=lambda p: -p.average_playoff_steals_per_game)[:10]
 
         data = {
-            'top_points_per_game': PlayerSerializer(top_points_per_game, many=True).data,
-            'top_rebounds_per_game': PlayerSerializer(top_rebounds_per_game, many=True).data,
-            'top_assists_per_game': PlayerSerializer(top_assists_per_game, many=True).data,
-            'top_three_points_made': PlayerSerializer(top_three_points_made, many=True).data,
-            'top_blocks_per_game': PlayerSerializer(top_blocks_per_game, many=True).data,
-            'top_steals_per_game': PlayerSerializer(top_steals_per_game, many=True).data,
+            'top_points_per_game': PlayerPlayoffsSerializer(top_points_per_game, many=True).data,
+            'top_rebounds_per_game': PlayerPlayoffsSerializer(top_rebounds_per_game, many=True).data,
+            'top_assists_per_game': PlayerPlayoffsSerializer(top_assists_per_game, many=True).data,
+            'top_three_points_made': PlayerPlayoffsSerializer(top_three_points_made, many=True).data,
+            'top_blocks_per_game': PlayerPlayoffsSerializer(top_blocks_per_game, many=True).data,
+            'top_steals_per_game': PlayerPlayoffsSerializer(top_steals_per_game, many=True).data,
         }
 
         return Response(data)

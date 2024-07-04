@@ -116,6 +116,76 @@ class PlayerSerializer(serializers.ModelSerializer):
         return obj.average_steals_per_game
 
 
+class PlayerPlayoffsSerializer(serializers.ModelSerializer):
+    total_playoff_two_point_fg = serializers.SerializerMethodField()
+    total_playoff_three_point_fg = serializers.SerializerMethodField()
+    total_playoff_free_throw_fg = serializers.SerializerMethodField()
+    total_playoff_points = serializers.SerializerMethodField()
+    total_playoff_rebounds = serializers.SerializerMethodField()
+    total_playoff_assists = serializers.SerializerMethodField()
+    total_playoff_steals = serializers.SerializerMethodField()
+    total_playoff_blocks = serializers.SerializerMethodField()
+    total_playoff_fouls = serializers.SerializerMethodField()
+
+    average_playoff_points_per_game = serializers.SerializerMethodField()
+    average_playoff_rebounds_per_game = serializers.SerializerMethodField()
+    average_playoff_assists_per_game = serializers.SerializerMethodField()
+    average_playoff_blocks_per_game = serializers.SerializerMethodField()
+    average_playoff_steals_per_game = serializers.SerializerMethodField()
+
+    team = TeamSerializer()
+
+    class Meta:
+        model = Player
+        fields = ['name', 'jersey_number', 'position', 'team',
+                  'total_two_point_fg', 'total_three_point_fg', 'total_free_throw_fg',
+                  'total_points', 'total_rebounds', 'total_assists', 'total_steals',
+                  'total_blocks', 'total_fouls',
+                  'average_points_per_game', 'average_rebounds_per_game', 'average_assists_per_game',
+                  'average_blocks_per_game', 'average_steals_per_game']
+
+    def get_total_playoff_two_point_fg(self, obj):
+        return obj.total_playoff_two_point_fg
+
+    def get_total_playoff_three_point_fg(self, obj):
+        return obj.total_playoff_three_point_fg
+
+    def get_total_playoff_free_throw_fg(self, obj):
+        return obj.total_playoff_free_throw_fg
+
+    def get_total_playoff_points(self, obj):
+        return obj.total_playoff_points
+
+    def get_total_playoff_rebounds(self, obj):
+        return obj.total_playoff_rebounds
+
+    def get_total_playoff_assists(self, obj):
+        return obj.total_playoff_assists
+
+    def get_total_playoff_steals(self, obj):
+        return obj.total_playoff_steals
+
+    def get_total_playoff_blocks(self, obj):
+        return obj.total_playoff_blocks
+
+    def get_total_playoff_fouls(self, obj):
+        return obj.total_playoff_fouls
+
+    def get_average_playoff_points_per_game(self, obj):
+        return obj.average_playoff_points_per_game
+
+    def get_average_playoff_rebounds_per_game(self, obj):
+        return obj.average_playoff_rebounds_per_game
+
+    def get_average_playoff_assists_per_game(self, obj):
+        return obj.average_playoff_assists_per_game
+
+    def get_average_playoff_blocks_per_game(self, obj):
+        return obj.average_playoff_blocks_per_game
+
+    def get_average_playoff_steals_per_game(self, obj):
+        return obj.average_playoff_steals_per_game
+
 class GameSerializer(serializers.ModelSerializer):
     home_team = TeamSerializer()
     away_team = TeamSerializer()
