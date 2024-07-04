@@ -24,8 +24,8 @@ class Game(models.Model):
     ]
 
     playoff_game = models.CharField(max_length=3, choices=PLAYOFF_CHOICES, null=True, blank=True)
-    
-    game_number = models.PositiveIntegerField(null=True)
+
+    game_number = models.PositiveIntegerField(blank=True, null=True)
 
     date = models.DateTimeField(null=True)
     home_team = models.ForeignKey(Team, related_name='home_games', on_delete=models.CASCADE)

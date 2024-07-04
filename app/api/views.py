@@ -122,8 +122,11 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
             # Get or create player
             player, _ = Player.objects.get_or_create(name=player_name)
 
-            # Get or create game
-            game, _ = Game.objects.get_or_create(game_number=game_number)
+            if isinstance(game_number, str) and "F" in game_number:
+                game, _ = Game.objects.get_or_create(playoff_game=game_number)
+            else:
+                # Get or create game
+                game, _ = Game.objects.get_or_create(game_number=game_number)
 
             # Create player statistics
             PlayerStatistics.objects.create(
