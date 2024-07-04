@@ -81,7 +81,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 class GameViewSet(viewsets.ModelViewSet):
-    queryset = Game.objects.exclude(game_number__isnull=False).order_by('game_number')
+    queryset = Game.objects.exclude(game_number__isnull=True).order_by('game_number')
     serializer_class = GameWithStatsSerializer
     permission_classes = []
     http_method_names = ['get']
@@ -90,7 +90,7 @@ class GameViewSet(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 class PlayerStatisticsViewSet(viewsets.ModelViewSet):
-    queryset = PlayerStatistics.objects.exclude(game__playoff_game__isnull=False).all()
+    queryset = PlayerStatistics.objects.exclude(game__playoff_game__isnull=True).all()
     serializer_class = PlayerStatisticsSerializer
     permission_classes = []
     http_method_names = ['get']
@@ -146,7 +146,7 @@ class TopPlayersViewSet(viewsets.ViewSet):
     permission_classes = []
 
     def list(self, request):
-        players = Player.objects.exclude(playerstatistics__game__playoff_game__isnull=False).all()  # Fetch all players
+        players = Player.objects.exclude(playerstatistics__game__playoff_game__isnull=True).all()  # Fetch all players
 
         # Sort players based on different statistics using lambda functions
         top_points_per_game = sorted(players, key=lambda p: -p.average_points_per_game)[:10]
