@@ -169,3 +169,28 @@ class TopPlayersViewSet(viewsets.ViewSet):
         }
 
         return Response(data)
+
+class TopPlayoffsPlayersViewSet(viewsets.ViewSet):
+    permission_classes = []
+
+    def list(self, request):
+        players = Player.objects.all()  # Fetch all players
+
+        # Sort players based on different statistics using lambda functions
+        top_points_per_game = sorted(players, key=lambda p: -p.average_playoff_points_per_game)[:10]
+        top_rebounds_per_game = sorted(players, key=lambda p: -p.average_playoff_rebounds_per_game)[:10]
+        top_assists_per_game = sorted(players, key=lambda p: -p.average_playoff_assists_per_game)[:10]
+        top_three_points_made = sorted(players, key=lambda p: -p.total_playoff_three_point_fg)[:10]
+        top_blocks_per_game = sorted(players, key=lambda p: -p.average_playoff_blocks_per_game)[:10]
+        top_steals_per_game = sorted(players, key=lambda p: -p.average_playoff_steals_per_game)[:10]
+
+        data = {
+            'top_points_per_game': PlayerSerializer(top_points_per_game, many=True).data,
+            'top_rebounds_per_game': PlayerSerializer(top_rebounds_per_game, many=True).data,
+            'top_assists_per_game': PlayerSerializer(top_assists_per_game, many=True).data,
+            'top_three_points_made': PlayerSerializer(top_three_points_made, many=True).data,
+            'top_blocks_per_game': PlayerSerializer(top_blocks_per_game, many=True).data,
+            'top_steals_per_game': PlayerSerializer(top_steals_per_game, many=True).data,
+        }
+
+        return Response(data)
