@@ -138,11 +138,11 @@ class PlayerPlayoffsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = ['name', 'jersey_number', 'position', 'team',
-                  'total_two_point_fg', 'total_three_point_fg', 'total_free_throw_fg',
-                  'total_points', 'total_rebounds', 'total_assists', 'total_steals',
-                  'total_blocks', 'total_fouls',
-                  'average_points_per_game', 'average_rebounds_per_game', 'average_assists_per_game',
-                  'average_blocks_per_game', 'average_steals_per_game']
+                  'total_playoff_two_point_fg', 'total_playoff_three_point_fg', 'total_playoff_free_throw_fg',
+                  'total_playoff_points', 'total_playoff_rebounds', 'total_playoff_assists', 'total_playoff_steals',
+                  'total_playoff_blocks', 'total_playoff_fouls',
+                  'average_playoff_points_per_game', 'average_playoff_rebounds_per_game', 'average_playoff_assists_per_game',
+                  'average_playoff_blocks_per_game', 'average_playoff_steals_per_game']
 
     def get_total_playoff_two_point_fg(self, obj):
         return obj.total_playoff_two_point_fg
