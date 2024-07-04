@@ -74,7 +74,13 @@ class PlayerViewSet(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 class GameViewSet(viewsets.ModelViewSet):
-    queryset = Game.objects.exclude(game_number__isnull=True).order_by('game_number')
+    queryset = Game.objects.annotate(
+        effective_game_number=Case(
+            When(game_number__isnull=True, then=F('playoff_game')),
+            default=F('game_number'),
+            output_field=CharField(),
+        )
+    ).order_by('-date')
     serializer_class = GameWithStatsSerializer
     permission_classes = []
     http_method_names = ['get']
