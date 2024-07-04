@@ -19,22 +19,14 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 import csv
 
-class PlayoffTeamsViewSet(viewsets.ViewSet):
+class PlayoffTeamsViewSet(viewsets.ModelViewSet):
+    queryset = Game.objects.exclude(game_number__isnull=False).order_by('date')
+    serializer_class = GameWithStatsSerializer
     permission_classes = []
+    http_method_names = ['get']
 
-    def list(self, request):
-        playoff_stages = ['QF1', 'QF2', 'SF1', 'SF2', 'F']
-        playoff_teams = {}
-
-        for stage in playoff_stages:
-            games = Game.objects.filter(playoff_game=stage)
-            teams = set()
-            for game in games:
-                teams.add(game.home_team)
-                teams.add(game.away_team)
-            playoff_teams[stage] = TeamSerializer(list(teams), many=True).data
-
-        return Response(playoff_teams)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 class PlayerCSVUploadViewSet(viewsets.ViewSet):
     permission_classes = []
