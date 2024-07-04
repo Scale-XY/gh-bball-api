@@ -149,7 +149,7 @@ class TopPlayersViewSet(viewsets.ViewSet):
     permission_classes = []
 
     def list(self, request):
-        players = Player.objects.exclude(player_statistics__game__playoff_game__isnull=False).all()  # Fetch all players
+        players = Player.objects.exclude(statistics__game__playoff_game__isnull=False).all()  # Fetch all players
 
         # Sort players based on different statistics using lambda functions
         top_points_per_game = sorted(players, key=lambda p: -p.average_points_per_game)[:10]
