@@ -67,12 +67,12 @@ class PlayerCSVUploadViewSet(viewsets.ViewSet):
                 team_name = data.pop('team')
 
                 # Get or create the team
-                team, created = Team.objects.get_or_create(name=team_name, season=season.id)
+                team, created = Team.objects.get_or_create(name=team_name, season=season)
 
                 # Update or create the player with the associated team and season
                 player, created = Player.objects.update_or_create(
                     name=data['name'],
-                    season=season.id,
+                    season=season,
                     defaults={**data, 'team': team}
                 )
                 
