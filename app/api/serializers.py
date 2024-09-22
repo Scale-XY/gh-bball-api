@@ -1,6 +1,12 @@
 # serializers.py
 from rest_framework import serializers
-from .models import Team, Player, Game, PlayerStatistics
+from .models import Team, Player, Game, PlayerStatistics, Season
+
+
+class SeasonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Season
+        fields = ['number']
 
 class TeamSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,7 +17,7 @@ class PlayerDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Player
-        fields = ['name', 'jersey_number', 'position', 'team']
+        fields = ['name', 'jersey_number', 'position', 'team', 'season']
 
 
 class PlayerOnlySerializer(serializers.ModelSerializer):
@@ -28,7 +34,7 @@ class PlayerOnlySerializer(serializers.ModelSerializer):
         model = Player
         fields = ['name', 'jersey_number', 'position', 'team',
             'total_points', 'total_rebounds', 'total_assists', 'total_steals',
-            'total_blocks']
+            'total_blocks', 'season']
 
     def get_total_points(self, obj):
         return obj.total_points
@@ -71,7 +77,7 @@ class PlayerSerializer(serializers.ModelSerializer):
                   'total_points', 'total_rebounds', 'total_assists', 'total_steals',
                   'total_blocks', 'total_fouls',
                   'average_points_per_game', 'average_rebounds_per_game', 'average_assists_per_game',
-                  'average_blocks_per_game', 'average_steals_per_game']
+                  'average_blocks_per_game', 'average_steals_per_game', 'season']
 
     def get_total_two_point_fg(self, obj):
         return obj.total_two_point_fg
@@ -142,7 +148,7 @@ class PlayerPlayoffsSerializer(serializers.ModelSerializer):
                   'total_playoff_points', 'total_playoff_rebounds', 'total_playoff_assists', 'total_playoff_steals',
                   'total_playoff_blocks', 'total_playoff_fouls',
                   'average_playoff_points_per_game', 'average_playoff_rebounds_per_game', 'average_playoff_assists_per_game',
-                  'average_playoff_blocks_per_game', 'average_playoff_steals_per_game']
+                  'average_playoff_blocks_per_game', 'average_playoff_steals_per_game', 'season']
 
     def get_total_playoff_two_point_fg(self, obj):
         return obj.total_playoff_two_point_fg
@@ -205,7 +211,7 @@ class PlayerStatisticsSerializer(serializers.ModelSerializer):
         model = PlayerStatistics
         fields = ['player', 'game', 'two_point_fg', 'three_point_fg', 'free_throw_fg',
                   'offensive_rebounds', 'defensive_rebounds', 'assists', 'steals', 'blocks', 'fouls',
-                  'total_points', 'total_rebounds']
+                  'total_points', 'total_rebounds', 'season']
 
     def get_total_points(self, obj):
         return obj.total_points
@@ -228,7 +234,7 @@ class TeamWithGamesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = '__all__'
+        fields = ['name', 'hex_color', 'wins', 'losses', 'logo_url', 'season', 'games']  
 
     def get_games(self, obj):
         home_games = obj.home_games.all()

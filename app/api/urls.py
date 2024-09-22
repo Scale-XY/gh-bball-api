@@ -5,10 +5,10 @@ from .views import TeamViewSet, PlayerViewSet, GameViewSet, PlayerStatisticsView
 from .views import TopPlayersViewSet, PlayoffTeamsViewSet, TopPlayoffsPlayersViewSet
 
 router = DefaultRouter()
-router.register(r'teams', TeamViewSet)
-router.register(r'players', PlayerViewSet)
-router.register(r'games', GameViewSet)
-router.register(r'player-statistics', PlayerStatisticsViewSet)
+router.register(r'teams', TeamViewSet, basename='teams')
+router.register(r'players', PlayerViewSet, basename='players')
+router.register(r'games', GameViewSet, basename='games')
+router.register(r'player-statistics', PlayerStatisticsViewSet, basename='player-statistics')
 router.register(r'players-upload', PlayerCSVUploadViewSet, basename='player-csv-upload')
 router.register(r'upload-player-statistics', UploadPlayerStatisticsViewSet, basename='csv-upload-player-statistics')
 router.register(r'top-players', TopPlayersViewSet, basename='top-players')

@@ -2,11 +2,30 @@
 from django.db import models
 from django.db.models import Sum
 
+def get_default_season_id():
+    # Get the first season or create a new one if none exists
+    season, created = Season.objects.get_or_create(number=1)
+    return season.id
+
+
+class Season(models.Model):
+    number = models.PositiveIntegerField(unique=True)
+
+    def __str__(self):
+        return str(self.number)
+    
 class Team(models.Model):
     name = models.CharField(max_length=100, unique=True)
     hex_color = models.CharField(max_length=255, null=True)
     wins = models.PositiveIntegerField(default=0)
     losses = models.PositiveIntegerField(default=0)
+    logo_url = models.URLField(max_length=255, null=True, blank=True)  # optional logo URL
+    season = models.ForeignKey(Season, 
+                                default=get_default_season_id,
+                                related_name='teams', on_delete=models.CASCADE)  # new season field
+
+    class Meta:
+        unique_together = ('name', 'season')  # A team name can only be unique within a season
 
     def __str__(self):
         return self.name
@@ -24,6 +43,10 @@ class Game(models.Model):
         (SEMI_FINAL_2, 'Semifinal 2'),
         (FINAL, 'Final'),
     ]
+
+    season = models.ForeignKey(Season, 
+                                default=get_default_season_id,
+                                related_name='games', on_delete=models.CASCADE)
 
     playoff_game = models.CharField(max_length=3, choices=PLAYOFF_CHOICES, null=True, blank=True)
 
@@ -51,6 +74,12 @@ class Player(models.Model):
     jersey_number = models.IntegerField(null=True)
     position = models.CharField(max_length=255, null=True)
     team = models.ForeignKey(Team, related_name='players', on_delete=models.CASCADE)
+    season = models.ForeignKey(Season, 
+                                default=get_default_season_id,
+                                related_name='players', on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('name', 'season')  # A player name can only be unique within a season
 
     def __str__(self):
         return f"{self.name} {self.jersey_number}"

@@ -1,6 +1,6 @@
 # views.py
 from rest_framework import viewsets
-from .models import Team, Player, Game, PlayerStatistics
+from .models import Season, Team, Player, Game, PlayerStatistics
 from .serializers import TeamSerializer, PlayerSerializer, GameSerializer, GameWithStatsSerializer
 from .serializers import PlayerStatisticsSerializer, PlayerCSVSerializer, TeamWithGamesSerializer
 from .serializers import PlayerPlayoffsSerializer
@@ -20,10 +20,21 @@ from rest_framework.response import Response
 import csv
 
 class PlayoffTeamsViewSet(viewsets.ModelViewSet):
-    queryset = Game.objects.exclude(game_number__isnull=False).order_by('date')
     serializer_class = GameSerializer
     permission_classes = []
     http_method_names = ['get']
+
+    def get_queryset(self):
+        # Get the season from query parameters
+        season_number = self.request.query_params.get('season', 1)
+        # Start with the base queryset
+        queryset = Game.objects.exclude(game_number__isnull=False).order_by('date')
+        
+        # Filter by season if provided
+        if season_number:
+            queryset = queryset.filter(season__number=season_number) 
+        
+        return queryset
 
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
@@ -33,6 +44,7 @@ class PlayerCSVUploadViewSet(viewsets.ViewSet):
 
     def create(self, request):
         csv_file = request.FILES.get('csv_file')
+        season_number = request.data.get('season')  # Get season from request data
         if not csv_file.name.endswith('.csv'):
             return Response({'error': 'Invalid file format. Please upload a CSV file.'}, status=400)
 
@@ -41,13 +53,29 @@ class PlayerCSVUploadViewSet(viewsets.ViewSet):
 
         decoded_file = csv_file.read().decode('utf-8').splitlines()
         csv_reader = csv.DictReader(decoded_file)
+
+        season = None
+        if season_number:
+            season = Season.objects.get_or_create(number=season_number)
+        else:
+            raise ValueError('Season number is required')
+        
         for row in csv_reader:
             serializer = PlayerCSVSerializer(data=row)
             if serializer.is_valid():
                 data = serializer.validated_data
                 team_name = data.pop('team')
-                team, created = Team.objects.get_or_create(name=team_name)
-                player, created = Player.objects.update_or_create(name=data['name'], defaults={**data, 'team': team})
+
+                # Get or create the team
+                team, created = Team.objects.get_or_create(name=team_name, season=season)
+
+                # Update or create the player with the associated team and season
+                player, created = Player.objects.update_or_create(
+                    name=data['name'],
+                    season=season,
+                    defaults={**data, 'team': team}
+                )
+                
                 if created:
                     players_created += 1
                 else:
@@ -59,34 +87,54 @@ class PlayerCSVUploadViewSet(viewsets.ViewSet):
 
 
 class TeamViewSet(viewsets.ModelViewSet):
-    queryset = Team.objects.all().order_by('-wins', 'losses')
     serializer_class = TeamWithGamesSerializer
     permission_classes = []
     http_method_names = ['get']
 
+    def get_queryset(self):
+        season_number = self.request.query_params.get('season', 1)
+        if season_number:
+            return Team.objects.filter(season__number=season_number).distinct().order_by('-wins', 'losses')
+        return Team.objects.all().order_by('-wins', 'losses')
+
 class PlayerViewSet(viewsets.ModelViewSet):
-    queryset = Player.objects.all()
     serializer_class = PlayerSerializer
     permission_classes = []
     http_method_names = ['get']
+
+    def get_queryset(self):
+        season_number = self.request.query_params.get('season', 1)
+        if season_number:
+            return Player.objects.filter(season__number=season_number)
+        return Player.objects.all()
 
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
 class GameViewSet(viewsets.ModelViewSet):
-    queryset = Game.objects.all().order_by('-date')
     serializer_class = GameWithStatsSerializer
     permission_classes = []
     http_method_names = ['get']
+
+    def get_queryset(self):
+        season_number = self.request.query_params.get('season', 1)
+        if season_number:
+            return Game.objects.filter(season__number=season_number).order_by('-date')
+        return Game.objects.all().order_by('-date')
 
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
 class PlayerStatisticsViewSet(viewsets.ModelViewSet):
-    queryset = PlayerStatistics.objects.exclude(game__playoff_game__isnull=True).all()
     serializer_class = PlayerStatisticsSerializer
     permission_classes = []
     http_method_names = ['get']
+
+    def get_queryset(self):
+        season_number = self.request.query_params.get('season', 1)
+        if season_number:
+            return PlayerStatistics.objects.filter(game__season__number=season_number).exclude(game__playoff_game__isnull=True)
+        return PlayerStatistics.objects.exclude(game__playoff_game__isnull=True)
 
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
@@ -98,28 +146,35 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
 
     def create(self, request):
         file_obj = request.FILES.get('file')
+        season_number = request.data.get('season')  # Get season from request data
         if not file_obj:
             return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
 
         decoded_file = file_obj.read().decode('utf-8').splitlines()
 
         csv_reader = csv.reader(decoded_file)
-        next(csv_reader)  # Skip header row
+        next(csv_reader)  # Skip header 
+        
+        season = None
+        if season_number:
+            season = Season.objects.get_or_create(number=season_number)
+        else:
+            raise ValueError('Season number is required')
 
         for row in csv_reader:
-            player_name, game_number, two_point_fg, three_point_fg, free_throw_fg, defensive_rebounds, assists, steals, blocks, fouls = row
+            player_name, game_number, two_point_fg, three_point_fg, free_throw_fg, defensive_rebounds, offensive_rebounds, assists, steals, blocks, fouls = row
 
             if not game_number:
                 continue  # Skip entry if game number is blank
 
             # Get or create player
-            player, _ = Player.objects.get_or_create(name=player_name)
+            player, _ = Player.objects.get_or_create(name=player_name, season=season)
 
             if isinstance(game_number, str) and "F" in game_number:
-                game, _ = Game.objects.get_or_create(playoff_game=game_number)
+                game, _ = Game.objects.get_or_create(playoff_game=game_number, season=season)
             else:
                 # Get or create game
-                game, _ = Game.objects.get_or_create(game_number=game_number)
+                game, _ = Game.objects.get_or_create(game_number=game_number, season=season)
 
             # Create player statistics
             PlayerStatistics.objects.create(
@@ -129,6 +184,7 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
                 three_point_fg=three_point_fg,
                 free_throw_fg=free_throw_fg,
                 defensive_rebounds=defensive_rebounds,
+                offensive_rebounds=offensive_rebounds,
                 assists=assists,
                 steals=steals,
                 blocks=blocks,
@@ -142,7 +198,11 @@ class TopPlayersViewSet(viewsets.ViewSet):
     permission_classes = []
 
     def list(self, request):
-        players = Player.objects.all()  # Fetch all players
+        season_number = request.query_params.get('season', 1)
+        if season_number:
+            players = Player.objects.filter(season__number=season_number)  # Filter by season
+        else:
+            players = Player.objects.all()  # Fetch all players
 
         # Sort players based on different statistics using lambda functions
         top_points_per_game = sorted(players, key=lambda p: -p.average_points_per_game)[:10]
@@ -167,7 +227,11 @@ class TopPlayoffsPlayersViewSet(viewsets.ViewSet):
     permission_classes = []
 
     def list(self, request):
-        players = Player.objects.all()  # Fetch all players
+        season_number = request.query_params.get('season', 1)
+        if season_number:
+            players = Player.objects.filter(season__number=season_number)
+        else:
+            players = Player.objects.all()
 
         # Sort players based on different statistics using lambda functions
         top_points_per_game = sorted(players, key=lambda p: -p.average_playoff_points_per_game)[:10]
