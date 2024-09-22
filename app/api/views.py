@@ -72,7 +72,7 @@ class PlayerCSVUploadViewSet(viewsets.ViewSet):
                 # Update or create the player with the associated team and season
                 player, created = Player.objects.update_or_create(
                     name=data['name'],
-                    season=season,
+                    season=season.id,
                     defaults={**data, 'team': team}
                 )
                 
