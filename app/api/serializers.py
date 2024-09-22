@@ -239,8 +239,9 @@ class TeamWithGamesSerializer(serializers.ModelSerializer):
     def get_games(self, obj):
         home_games = obj.home_games.all()
         away_games = obj.away_games.all()
-        all_games = list(home_games) + list(away_games)
-        sorted_games = sorted(all_games, key=lambda game: game.game_number)  # Sort by game number
+        all_games = list(home_games) + list(away_games)   
+        # Sort by game number, placing None values at the end
+        sorted_games = sorted(all_games, key=lambda game: (game.game_number is None, game.game_number))
         return GameSerializer(sorted_games, many=True).data
 
 class PlayerCSVSerializer(serializers.Serializer):
