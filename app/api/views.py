@@ -157,7 +157,7 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
         
         season = None
         if season_number:
-            season = Season.objects.get_or_create(number=season_number)
+            season, created = Season.objects.get_or_create(number=season_number)
         else:
             raise ValueError('Season number is required')
 
