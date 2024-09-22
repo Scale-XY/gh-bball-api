@@ -167,14 +167,13 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
             if not game_number:
                 continue  # Skip entry if game number is blank
 
-            # Get or create player
-            player, _ = Player.objects.get_or_create(name=player_name, season=season)
+            # Get player
+            player = Player.objects.get(name=player_name, season=season)
 
             if isinstance(game_number, str) and "F" in game_number:
-                game, _ = Game.objects.get_or_create(playoff_game=game_number, season=season)
+                game = Game.objects.get(playoff_game=game_number, season=season)
             else:
-                # Get or create game
-                game, _ = Game.objects.get_or_create(game_number=game_number, season=season)
+                game = Game.objects.get(game_number=game_number, season=season)
 
             # Create player statistics
             PlayerStatistics.objects.create(
