@@ -211,7 +211,7 @@ class PlayerStatisticsSerializer(serializers.ModelSerializer):
         model = PlayerStatistics
         fields = ['player', 'game', 'two_point_fg', 'three_point_fg', 'free_throw_fg',
                   'offensive_rebounds', 'defensive_rebounds', 'assists', 'steals', 'blocks', 'fouls',
-                  'total_points', 'total_rebounds', 'season']
+                  'total_points', 'total_rebounds']
 
     def get_total_points(self, obj):
         return obj.total_points
