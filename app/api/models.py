@@ -16,7 +16,7 @@ class Season(models.Model):
     
 class Team(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    hex_color = models.CharField(max_length=255, null=True)
+    hex_color = models.CharField(max_length=255, null=True, blank=True)
     wins = models.PositiveIntegerField(default=0)
     losses = models.PositiveIntegerField(default=0)
     logo_url = models.URLField(max_length=255, null=True, blank=True)  # optional logo URL
