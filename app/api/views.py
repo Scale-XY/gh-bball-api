@@ -170,7 +170,7 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
             # Get player
             player = Player.objects.get(name=player_name, season=season)
 
-            if isinstance(game_number, str) and "F" in game_number:
+            if isinstance(game_number, str) and ("F" in game_number or "TTB" in game_number):
                 game = Game.objects.get(playoff_game=game_number, season=season)
             else:
                 game = Game.objects.get(game_number=game_number, season=season)
