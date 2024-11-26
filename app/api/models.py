@@ -37,6 +37,7 @@ class Game(models.Model):
     QUARTER_FINAL_4 = 'QF4'
     SEMI_FINAL_1 = 'SF1'
     SEMI_FINAL_2 = 'SF2'
+    TTB = 'TTB'
     FINAL = 'F'
     PLAYOFF_CHOICES = [
         (QUARTER_FINAL_1, 'Quarterfinal 1'),
@@ -45,6 +46,7 @@ class Game(models.Model):
         (QUARTER_FINAL_4, 'Quarterfinal 4'),
         (SEMI_FINAL_1, 'Semifinal 1'),
         (SEMI_FINAL_2, 'Semifinal 2'),
+        (TTB, 'TTB'),
         (FINAL, 'Final'),
     ]
 
