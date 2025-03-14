@@ -72,7 +72,7 @@ class PlayerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Player
-        fields = ['name', 'jersey_number', 'position', 'team',
+        fields = ['id', 'name', 'jersey_number', 'position', 'team',
                   'total_two_point_fg', 'total_three_point_fg', 'total_free_throw_fg',
                   'total_points', 'total_rebounds', 'total_assists', 'total_steals',
                   'total_blocks', 'total_fouls',
