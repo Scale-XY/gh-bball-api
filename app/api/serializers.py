@@ -225,9 +225,9 @@ class GameSerializer(serializers.ModelSerializer):
 class PlayerStatisticsSerializer(serializers.ModelSerializer):
     total_points = serializers.SerializerMethodField()
     total_rebounds = serializers.SerializerMethodField()
-    total_fg_made = serializers.SerializerMethodField()
-    total_fg_attempted = serializers.SerializerMethodField()
-    fg_percentage = serializers.SerializerMethodField()
+    field_goals_made = serializers.SerializerMethodField()
+    field_goals_attempted = serializers.SerializerMethodField()
+    field_goal_percentage = serializers.SerializerMethodField()
     two_point_percentage = serializers.SerializerMethodField()
     three_point_percentage = serializers.SerializerMethodField()
     free_throw_percentage = serializers.SerializerMethodField()
@@ -239,7 +239,7 @@ class PlayerStatisticsSerializer(serializers.ModelSerializer):
         fields = ['player', 'game', 'two_point_fg', 'three_point_fg', 'free_throw_fg',
                   'offensive_rebounds', 'defensive_rebounds', 'assists', 'steals', 'blocks', 'fouls',
                   'total_points', 'total_rebounds',
-                  'total_fg_made', 'total_fg_attempted', 'fg_percentage', 'two_point_percentage', 'three_point_percentage', 'free_throw_percentage']
+                  'field_goals_made', 'field_goals_attempted', 'field_goal_percentage', 'two_point_percentage', 'three_point_percentage', 'free_throw_percentage']
 
     def get_total_points(self, obj):
         return obj.total_points
@@ -247,14 +247,14 @@ class PlayerStatisticsSerializer(serializers.ModelSerializer):
     def get_total_rebounds(self, obj):
         return obj.total_rebounds
 
-    def get_total_fg_made(self, obj):
-        return obj.total_fg_made
+    def get_field_goals_made(self, obj):
+        return obj.field_goals_made
 
-    def get_total_fg_attempted(self, obj):
-        return obj.total_fg_attempted
+    def get_field_goals_attempted(self, obj):
+        return obj.field_goals_attempted
 
-    def get_fg_percentage(self, obj):
-        return obj.fg_percentage
+    def get_field_goal_percentage(self, obj):
+        return obj.field_goal_percentage
 
     def get_two_point_percentage(self, obj):
         return obj.two_point_percentage
