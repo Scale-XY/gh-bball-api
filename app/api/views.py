@@ -162,7 +162,11 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
             raise ValueError('Season number is required')
 
         for row in csv_reader:
-            player_name, game_number, two_point_fg, three_point_fg, free_throw_fg, defensive_rebounds, offensive_rebounds, assists, steals, blocks, fouls = row
+
+            player_name, game_number, minutes_played, two_point_fg, two_point_attempts, \
+            three_point_fg, three_point_attempts, free_throw_fg, free_throw_attempts, \
+            defensive_rebounds, offensive_rebounds, assists, turnovers, \
+            steals, blocks, fouls, fouls_drawn, plus_minus, efficiency = row
 
             if not game_number:
                 continue  # Skip entry if game number is blank
@@ -179,15 +183,23 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
             PlayerStatistics.objects.create(
                 player=player,
                 game=game,
+                minutes_played=minutes_played,
                 two_point_fg=two_point_fg,
+                two_point_attempts=two_point_attempts,
                 three_point_fg=three_point_fg,
+                three_point_attempts=three_point_attempts,
                 free_throw_fg=free_throw_fg,
+                free_throw_attempts=free_throw_attempts,
                 defensive_rebounds=defensive_rebounds,
                 offensive_rebounds=offensive_rebounds,
                 assists=assists,
+                turnovers=turnovers,
                 steals=steals,
                 blocks=blocks,
-                fouls=fouls
+                fouls=fouls,
+                fouls_drawn=fouls_drawn,
+                plus_minus=plus_minus,
+                efficiency=efficiency,
             )
 
         return Response({'message': 'CSV file uploaded successfully'}, status=status.HTTP_201_CREATED)

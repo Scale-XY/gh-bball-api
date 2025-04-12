@@ -77,7 +77,11 @@ class PlayerSerializer(serializers.ModelSerializer):
                   'total_points', 'total_rebounds', 'total_assists', 'total_steals',
                   'total_blocks', 'total_fouls',
                   'average_points_per_game', 'average_rebounds_per_game', 'average_assists_per_game',
-                  'average_blocks_per_game', 'average_steals_per_game', 'season']
+                  'average_blocks_per_game', 'average_steals_per_game', 'season',
+                  'field_goals_made', 'field_goals_attempted',
+                  'field_goal_percentage', 'two_point_percentage',
+                  'three_point_percentage', 'free_throw_percentage',
+                  ]
 
     def get_total_two_point_fg(self, obj):
         return obj.total_two_point_fg
@@ -121,6 +125,23 @@ class PlayerSerializer(serializers.ModelSerializer):
     def get_average_steals_per_game(self, obj):
         return obj.average_steals_per_game
 
+    def get_field_goals_made(self, obj):
+        return obj.total_fg_made
+
+    def get_field_goals_attempted(self, obj):
+        return obj.total_fg_attempted
+
+    def get_field_goal_percentage(self, obj):
+        return obj.fg_percentage
+
+    def get_two_point_percentage(self, obj):
+        return obj.two_point_percentage
+
+    def get_three_point_percentage(self, obj):
+        return obj.three_point_percentage
+
+    def get_free_throw_percentage(self, obj):
+        return obj.free_throw_percentage
 
 class PlayerPlayoffsSerializer(serializers.ModelSerializer):
     total_playoff_two_point_fg = serializers.SerializerMethodField()
@@ -204,20 +225,45 @@ class GameSerializer(serializers.ModelSerializer):
 class PlayerStatisticsSerializer(serializers.ModelSerializer):
     total_points = serializers.SerializerMethodField()
     total_rebounds = serializers.SerializerMethodField()
-    
+    field_goals_made = serializers.SerializerMethodField()
+    field_goals_attempted = serializers.SerializerMethodField()
+    field_goal_percentage = serializers.SerializerMethodField()
+    two_point_percentage = serializers.SerializerMethodField()
+    three_point_percentage = serializers.SerializerMethodField()
+    free_throw_percentage = serializers.SerializerMethodField()
+
     player = PlayerDetailSerializer()
 
     class Meta:
         model = PlayerStatistics
         fields = ['player', 'game', 'two_point_fg', 'three_point_fg', 'free_throw_fg',
                   'offensive_rebounds', 'defensive_rebounds', 'assists', 'steals', 'blocks', 'fouls',
-                  'total_points', 'total_rebounds']
+                  'total_points', 'total_rebounds',
+                  'field_goals_made', 'field_goals_attempted', 'field_goal_percentage', 'two_point_percentage', 'three_point_percentage', 'free_throw_percentage']
 
     def get_total_points(self, obj):
         return obj.total_points
 
     def get_total_rebounds(self, obj):
         return obj.total_rebounds
+
+    def get_field_goals_made(self, obj):
+        return obj.fg_made
+
+    def get_field_goals_attempted(self, obj):
+        return obj.fg_attempted
+
+    def get_field_goal_percentage(self, obj):
+        return obj.fg_percentage
+
+    def get_two_point_percentage(self, obj):
+        return obj.two_point_percentage
+
+    def get_three_point_percentage(self, obj):
+        return obj.three_point_percentage
+
+    def get_free_throw_percentage(self, obj):
+        return obj.free_throw_percentage
 
 class GameWithStatsSerializer(serializers.ModelSerializer):
     player_statistics = PlayerStatisticsSerializer(many=True, read_only=True)

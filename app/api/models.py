@@ -257,21 +257,65 @@ class Player(models.Model):
             return round(self.total_playoff_steals / total_games, 1)
         return 0
 
+    @property
+    def total_fg_made(self):
+        return self.total_two_point_fg + self.total_three_point_fg
+
+    @property
+    def total_fg_attempted(self):
+        two_point_attempts = self._aggregate_statistics('two_point_attempts')
+        three_point_attempts = self._aggregate_statistics('three_point_attempts')
+        return two_point_attempts + three_point_attempts
+
+    @property
+    def fg_percentage(self):
+        attempts = self.total_fg_attempted
+        return round((self.total_fg_made / attempts) * 100, 1) if attempts else 0.0
+
+    @property
+    def two_point_percentage(self):
+        attempts = self._aggregate_statistics('two_point_attempts')
+        return round((self.total_two_point_fg / attempts) * 100, 1) if attempts else 0.0
+
+    @property
+    def three_point_percentage(self):
+        attempts = self._aggregate_statistics('three_point_attempts')
+        return round((self.total_three_point_fg / attempts) * 100, 1) if attempts else 0.0
+
+    @property
+    def free_throw_percentage(self):
+        made = self.total_free_throw_fg
+        attempts = self._aggregate_statistics('free_throw_attempts')
+        return round((made / attempts) * 100, 1) if attempts else 0.0
+
+
 class PlayerStatistics(models.Model):
     player = models.ForeignKey(Player, related_name='statistics', on_delete=models.CASCADE)
     game = models.ForeignKey(Game, related_name='player_statistics', on_delete=models.CASCADE)
 
-    two_point_fg = models.PositiveIntegerField(default=0)
-    three_point_fg = models.PositiveIntegerField(default=0)
-    free_throw_fg = models.PositiveIntegerField(default=0)
+    minutes_played = models.PositiveIntegerField(default=0)  # min
 
-    offensive_rebounds = models.PositiveIntegerField(default=0)
-    defensive_rebounds = models.PositiveIntegerField(default=0)
+    two_point_fg = models.PositiveIntegerField(default=0)       # 2p_m
+    two_point_attempts = models.PositiveIntegerField(default=0) # 2p_a
 
-    assists = models.PositiveIntegerField(default=0)
-    steals = models.PositiveIntegerField(default=0)
-    blocks = models.PositiveIntegerField(default=0)
-    fouls = models.PositiveIntegerField(default=0)
+    three_point_fg = models.PositiveIntegerField(default=0)       # 3p_m
+    three_point_attempts = models.PositiveIntegerField(default=0) # 3p_a
+
+    free_throw_fg = models.PositiveIntegerField(default=0)       # ft_m
+    free_throw_attempts = models.PositiveIntegerField(default=0) # ft_a
+
+    offensive_rebounds = models.PositiveIntegerField(default=0)  # or
+    defensive_rebounds = models.PositiveIntegerField(default=0)  # df
+
+    assists = models.PositiveIntegerField(default=0)             # as
+    turnovers = models.PositiveIntegerField(default=0)           # to
+    steals = models.PositiveIntegerField(default=0)              # st
+    blocks = models.PositiveIntegerField(default=0)              # bs
+    fouls = models.PositiveIntegerField(default=0)               # pf
+    fouls_drawn = models.PositiveIntegerField(default=0)         # fd
+
+    plus_minus = models.IntegerField(default=0)                  # +/-
+    efficiency = models.IntegerField(default=0)                  # ef
 
     @property
     def total_points(self):
@@ -280,6 +324,31 @@ class PlayerStatistics(models.Model):
     @property
     def total_rebounds(self):
         return self.offensive_rebounds + self.defensive_rebounds
+
+    @property
+    def field_goals_made(self):
+        return self.two_point_fg + self.three_point_fg
+
+    @property
+    def field_goals_attempted(self):
+        return self.two_point_attempts + self.three_point_attempts
+
+    @property
+    def field_goal_percentage(self):
+        attempts = self.field_goals_attempted
+        return round((self.field_goals_made / attempts) * 100, 1) if attempts else 0.0
+
+    @property
+    def two_point_percentage(self):
+        return round((self.two_point_fg / self.two_point_attempts) * 100, 1) if self.two_point_attempts else 0.0
+
+    @property
+    def three_point_percentage(self):
+        return round((self.three_point_fg / self.three_point_attempts) * 100, 1) if self.three_point_attempts else 0.0
+
+    @property
+    def free_throw_percentage(self):
+        return round((self.free_throw_fg / self.free_throw_attempts) * 100, 1) if self.free_throw_attempts else 0.0
 
     class Meta:
         unique_together = ('player', 'game')
