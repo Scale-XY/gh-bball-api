@@ -314,8 +314,8 @@ class PlayerStatistics(models.Model):
     fouls = models.PositiveIntegerField(default=0)               # pf
     fouls_drawn = models.PositiveIntegerField(default=0)         # fd
 
-    plus_minus = models.IntegerField(default=0)                  # +/-
-    efficiency = models.IntegerField(default=0)                  # ef
+    plus_minus = models.DecimalField(max_digits=5, decimal_places=2, default=0)  # Allows values like 123.45 or 0.20
+    efficiency = models.DecimalField(max_digits=5, decimal_places=2, default=0)  # Allows values like 123.45 or 0.20
 
     @property
     def total_points(self):
