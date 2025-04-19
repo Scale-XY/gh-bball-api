@@ -1,6 +1,7 @@
 # serializers.py
 from rest_framework import serializers
 from .models import Team, Player, Game, PlayerStatistics, Season
+from django.db.models import Sum
 
 
 class SeasonSerializer(serializers.ModelSerializer):
