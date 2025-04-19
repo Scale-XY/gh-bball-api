@@ -310,7 +310,7 @@ class TeamWithGamesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = ['name', 'hex_color', 'wins', 'losses', 'logo_url', 'season', 'games']  
+        fields = ['id', 'name', 'hex_color', 'wins', 'losses', 'logo_url', 'season', 'games']  
 
     def get_games(self, obj):
         home_games = obj.home_games.all()
