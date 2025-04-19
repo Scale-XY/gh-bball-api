@@ -180,7 +180,7 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
                 continue  # Skip entry if game number is blank
             
             player_name = player_name.strip()
-            
+
             try:
                 player = Player.objects.get(name=player_name, season=season)
             except Player.DoesNotExist:
@@ -198,26 +198,28 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
             minutes_played = self.parse_minutes_played(minutes_played)
 
             # Create player statistics
-            PlayerStatistics.objects.create(
+            PlayerStatistics.objects.update_or_create(
                 player=player,
                 game=game,
-                minutes_played=minutes_played,
-                two_point_fg=two_point_fg,
-                two_point_attempts=two_point_attempts,
-                three_point_fg=three_point_fg,
-                three_point_attempts=three_point_attempts,
-                free_throw_fg=free_throw_fg,
-                free_throw_attempts=free_throw_attempts,
-                defensive_rebounds=defensive_rebounds,
-                offensive_rebounds=offensive_rebounds,
-                assists=assists,
-                turnovers=turnovers,
-                steals=steals,
-                blocks=blocks,
-                fouls=fouls,
-                fouls_drawn=fouls_drawn,
-                plus_minus=plus_minus,
-                efficiency=efficiency,
+                defaults={
+                    'minutes_played': minutes_played,
+                    'two_point_fg': two_point_fg,
+                    'two_point_attempts': two_point_attempts,
+                    'three_point_fg': three_point_fg,
+                    'three_point_attempts': three_point_attempts,
+                    'free_throw_fg': free_throw_fg,
+                    'free_throw_attempts': free_throw_attempts,
+                    'defensive_rebounds': defensive_rebounds,
+                    'offensive_rebounds': offensive_rebounds,
+                    'assists': assists,
+                    'turnovers': turnovers,
+                    'steals': steals,
+                    'blocks': blocks,
+                    'fouls': fouls,
+                    'fouls_drawn': fouls_drawn,
+                    'plus_minus': plus_minus,
+                    'efficiency': efficiency,
+                }
             )
 
         return Response({'message': 'CSV file uploaded successfully'}, status=status.HTTP_201_CREATED)
