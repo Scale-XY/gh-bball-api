@@ -178,7 +178,9 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
 
             if not game_number:
                 continue  # Skip entry if game number is blank
-
+            
+            player_name = player_name.strip()
+            
             try:
                 player = Player.objects.get(name=player_name, season=season)
             except Player.DoesNotExist:
