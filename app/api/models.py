@@ -136,6 +136,10 @@ class Player(models.Model):
         return self._aggregate_statistics('steals')
 
     @property
+    def total_turnovers(self):
+        return self._aggregate_statistics('turnovers')
+    
+    @property
     def total_blocks(self):
         return self._aggregate_statistics('blocks')
 

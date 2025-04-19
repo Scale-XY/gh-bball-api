@@ -238,7 +238,7 @@ class PlayerStatisticsSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlayerStatistics
         fields = ['player', 'game', 'two_point_fg', 'three_point_fg', 'free_throw_fg',
-                  'offensive_rebounds', 'defensive_rebounds', 'assists', 'steals', 'blocks', 'fouls',
+                  'offensive_rebounds', 'defensive_rebounds', 'assists', 'turnovers', 'steals', 'blocks', 'fouls',
                   'total_points', 'total_rebounds',
                   'field_goals_made', 'field_goals_attempted', 'field_goal_percentage', 'two_point_percentage', 'three_point_percentage', 'free_throw_percentage']
 
@@ -293,6 +293,7 @@ class TeamDetailSerializer(serializers.ModelSerializer):
             'total_assists': sum_stat('assists'),
             'total_blocks': sum_stat('blocks'),
             'total_steals': sum_stat('steals'),
+            'total_turnovers': sum_stat('turnovers'),
             'total_fouls': sum_stat('fouls'),
         }
     
