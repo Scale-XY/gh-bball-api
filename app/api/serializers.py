@@ -265,6 +265,36 @@ class PlayerStatisticsSerializer(serializers.ModelSerializer):
     def get_free_throw_percentage(self, obj):
         return obj.free_throw_percentage
 
+class TeamDetailSerializer(serializers.ModelSerializer):
+    player_statistics = serializers.SerializerMethodField()
+    team_stats = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Team
+        fields = [
+            'id', 'name', 'hex_color', 'wins', 'losses', 'logo_url', 'season',
+            'player_statistics', 'team_stats'
+        ]
+
+    def get_player_statistics(self, obj):
+        stats = PlayerStatistics.objects.filter(player__team=obj)
+        return PlayerStatisticsSerializer(stats, many=True).data
+
+    def get_team_stats(self, obj):
+        stats = PlayerStatistics.objects.filter(player__team=obj)
+
+        def sum_stat(field):
+            return stats.aggregate(total=Sum(field))['total'] or 0
+
+        return {
+            'total_points': sum((s.total_points for s in stats), 0),
+            'total_rebounds': sum((s.total_rebounds for s in stats), 0),
+            'total_assists': sum_stat('assists'),
+            'total_blocks': sum_stat('blocks'),
+            'total_steals': sum_stat('steals'),
+            'total_fouls': sum_stat('fouls'),
+        }
+    
 class GameWithStatsSerializer(serializers.ModelSerializer):
     player_statistics = PlayerStatisticsSerializer(many=True, read_only=True)
     home_team = TeamSerializer()

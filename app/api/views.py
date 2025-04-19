@@ -1,7 +1,7 @@
 # views.py
 from rest_framework import viewsets
 from .models import Season, Team, Player, Game, PlayerStatistics
-from .serializers import TeamSerializer, PlayerSerializer, GameSerializer, GameWithStatsSerializer
+from .serializers import TeamDetailSerializer, TeamSerializer, PlayerSerializer, GameSerializer, GameWithStatsSerializer
 from .serializers import PlayerStatisticsSerializer, PlayerCSVSerializer, TeamWithGamesSerializer
 from .serializers import PlayerPlayoffsSerializer
 from rest_framework.decorators import action
@@ -88,7 +88,6 @@ class PlayerCSVUploadViewSet(viewsets.ViewSet):
 
 
 class TeamViewSet(viewsets.ModelViewSet):
-    serializer_class = TeamWithGamesSerializer
     permission_classes = []
     http_method_names = ['get']
 
@@ -98,6 +97,11 @@ class TeamViewSet(viewsets.ModelViewSet):
             return Team.objects.filter(season__number=season_number).distinct().order_by('-wins', 'losses')
         return Team.objects.all().order_by('-wins', 'losses')
 
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return TeamDetailSerializer
+        return TeamWithGamesSerializer
+    
 class PlayerViewSet(viewsets.ModelViewSet):
     serializer_class = PlayerSerializer
     permission_classes = []
