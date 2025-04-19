@@ -293,7 +293,7 @@ class PlayerStatistics(models.Model):
     player = models.ForeignKey(Player, related_name='statistics', on_delete=models.CASCADE)
     game = models.ForeignKey(Game, related_name='player_statistics', on_delete=models.CASCADE)
 
-    minutes_played = models.PositiveIntegerField(default=0)  # min
+    minutes_played = models.PositiveIntegerField(default=0)  # this is total seconds
 
     two_point_fg = models.PositiveIntegerField(default=0)       # 2p_m
     two_point_attempts = models.PositiveIntegerField(default=0) # 2p_a

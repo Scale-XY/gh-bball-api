@@ -144,6 +144,12 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
     permission_classes = []
     parser_classes = [MultiPartParser, FormParser]
 
+    def parse_minutes_played(self, time_str):
+        if isinstance(time_str, str) and ":" in time_str:
+            minutes, seconds = map(int, time_str.split(":"))
+            return minutes * 60 + seconds
+        return 0  # default fallback
+    
     def create(self, request):
         file_obj = request.FILES.get('file')
         season_number = request.data.get('season')  # Get season from request data
@@ -178,6 +184,8 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
                 game = Game.objects.get(playoff_game=game_number, season=season)
             else:
                 game = Game.objects.get(game_number=game_number, season=season)
+
+            minutes_played = self.parse_minutes_played(minutes_played)
 
             # Create player statistics
             PlayerStatistics.objects.create(
