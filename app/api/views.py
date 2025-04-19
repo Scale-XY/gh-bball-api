@@ -6,6 +6,7 @@ from .serializers import PlayerStatisticsSerializer, PlayerCSVSerializer, TeamWi
 from .serializers import PlayerPlayoffsSerializer
 from rest_framework.decorators import action
 
+from django.db import transaction
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 
@@ -150,6 +151,7 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
             return minutes * 60 + seconds
         return 0  # default fallback
     
+    @transaction.atomic
     def create(self, request):
         file_obj = request.FILES.get('file')
         season_number = request.data.get('season')  # Get season from request data
@@ -171,14 +173,20 @@ class UploadPlayerStatisticsViewSet(viewsets.ViewSet):
 
             player_name, game_number, minutes_played, two_point_fg, two_point_attempts, \
             three_point_fg, three_point_attempts, free_throw_fg, free_throw_attempts, \
-            defensive_rebounds, offensive_rebounds, assists, turnovers, \
+            offensive_rebounds, defensive_rebounds, assists, turnovers, \
             steals, blocks, fouls, fouls_drawn, plus_minus, efficiency = row
 
             if not game_number:
                 continue  # Skip entry if game number is blank
 
-            # Get player
-            player = Player.objects.get(name=player_name, season=season)
+            try:
+                player = Player.objects.get(name=player_name, season=season)
+            except Player.DoesNotExist:
+                return Response({
+                    'error': "Player not found at row",
+                    'player_name': player_name,
+                    'season': season_number
+                }, status=status.HTTP_400_BAD_REQUEST)
 
             if isinstance(game_number, str) and ("F" in game_number or "TTB" in game_number):
                 game = Game.objects.get(playoff_game=game_number, season=season)
