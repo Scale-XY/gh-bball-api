@@ -270,6 +270,10 @@ class TopPlayersViewSet(viewsets.ViewSet):
         else:
             players = Player.objects.all()  # Fetch all players
 
+        # If not using fairness-adjusted stats, filter players who played at least 75% of team games
+        if not use_fairness_adjusted:
+            players = [p for p in players if p.games_played_ratio >= 0.75]
+
         # Sort players based on different statistics using lambda functions
         if use_fairness_adjusted:
             # Use fairness-adjusted statistics that consider team's total games played
@@ -296,6 +300,12 @@ class TopPlayersViewSet(viewsets.ViewSet):
             'top_blocks_per_game': PlayerSerializer(top_blocks_per_game, many=True).data,
             'top_steals_per_game': PlayerSerializer(top_steals_per_game, many=True).data,
             'fairness_adjusted': use_fairness_adjusted,
+            'min_games_played_ratio': 0.75 if not use_fairness_adjusted else None,
+            'filtering_info': {
+                'fairness_adjusted': use_fairness_adjusted,
+                'min_games_played_ratio': 0.75 if not use_fairness_adjusted else None,
+                'description': 'When fairness_adjusted=false, only players who played at least 75% of their team\'s games are included to ensure data quality.'
+            }
         }
 
         return Response(data)
@@ -305,12 +315,16 @@ class TopPlayoffsPlayersViewSet(viewsets.ViewSet):
 
     def list(self, request):
         season_number = request.query_params.get('season', 1)
-        use_fairness_adjusted = request.query_params.get('fairness_adjusted', 'true').lower() == 'true'
+        use_fairness_adjusted = request.query_params.get('fairness_adjusted', 'false').lower() == 'true'
         
         if season_number:
             players = Player.objects.filter(season__number=season_number)
         else:
             players = Player.objects.all()
+
+        # If not using fairness-adjusted stats, filter players who played at least 75% of team playoff games
+        if not use_fairness_adjusted:
+            players = [p for p in players if p.playoff_games_played_ratio >= 0.75]
 
         # Sort players based on different statistics using lambda functions
         if use_fairness_adjusted:
@@ -338,6 +352,12 @@ class TopPlayoffsPlayersViewSet(viewsets.ViewSet):
             'top_blocks_per_game': PlayerPlayoffsSerializer(top_blocks_per_game, many=True).data,
             'top_steals_per_game': PlayerPlayoffsSerializer(top_steals_per_game, many=True).data,
             'fairness_adjusted': use_fairness_adjusted,
+            'min_games_played_ratio': 0.75 if not use_fairness_adjusted else None,
+            'filtering_info': {
+                'fairness_adjusted': use_fairness_adjusted,
+                'min_games_played_ratio': 0.75 if not use_fairness_adjusted else None,
+                'description': 'When fairness_adjusted=false, only players who played at least 75% of their team\'s games are included to ensure data quality.'
+            }
         }
 
         return Response(data)
