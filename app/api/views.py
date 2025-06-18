@@ -234,18 +234,30 @@ class TopPlayersViewSet(viewsets.ViewSet):
 
     def list(self, request):
         season_number = request.query_params.get('season', 1)
+        use_fairness_adjusted = request.query_params.get('fairness_adjusted', 'true').lower() == 'true'
+        
         if season_number:
             players = Player.objects.filter(season__number=season_number)  # Filter by season
         else:
             players = Player.objects.all()  # Fetch all players
 
         # Sort players based on different statistics using lambda functions
-        top_points_per_game = sorted(players, key=lambda p: -p.average_points_per_game)[:10]
-        top_rebounds_per_game = sorted(players, key=lambda p: -p.average_rebounds_per_game)[:10]
-        top_assists_per_game = sorted(players, key=lambda p: -p.average_assists_per_game)[:10]
-        top_three_points_made = sorted(players, key=lambda p: -p.total_three_point_fg)[:10]
-        top_blocks_per_game = sorted(players, key=lambda p: -p.average_blocks_per_game)[:10]
-        top_steals_per_game = sorted(players, key=lambda p: -p.average_steals_per_game)[:10]
+        if use_fairness_adjusted:
+            # Use fairness-adjusted statistics that consider team's total games played
+            top_points_per_game = sorted(players, key=lambda p: -p.fairness_adjusted_points_per_game)[:10]
+            top_rebounds_per_game = sorted(players, key=lambda p: -p.fairness_adjusted_rebounds_per_game)[:10]
+            top_assists_per_game = sorted(players, key=lambda p: -p.fairness_adjusted_assists_per_game)[:10]
+            top_three_points_made = sorted(players, key=lambda p: -p.total_three_point_fg)[:10]  # Total 3PM doesn't need adjustment
+            top_blocks_per_game = sorted(players, key=lambda p: -p.fairness_adjusted_blocks_per_game)[:10]
+            top_steals_per_game = sorted(players, key=lambda p: -p.fairness_adjusted_steals_per_game)[:10]
+        else:
+            # Use original per-game statistics (player's games played only)
+            top_points_per_game = sorted(players, key=lambda p: -p.average_points_per_game)[:10]
+            top_rebounds_per_game = sorted(players, key=lambda p: -p.average_rebounds_per_game)[:10]
+            top_assists_per_game = sorted(players, key=lambda p: -p.average_assists_per_game)[:10]
+            top_three_points_made = sorted(players, key=lambda p: -p.total_three_point_fg)[:10]
+            top_blocks_per_game = sorted(players, key=lambda p: -p.average_blocks_per_game)[:10]
+            top_steals_per_game = sorted(players, key=lambda p: -p.average_steals_per_game)[:10]
 
         data = {
             'top_points_per_game': PlayerSerializer(top_points_per_game, many=True).data,
@@ -254,6 +266,7 @@ class TopPlayersViewSet(viewsets.ViewSet):
             'top_three_points_made': PlayerSerializer(top_three_points_made, many=True).data,
             'top_blocks_per_game': PlayerSerializer(top_blocks_per_game, many=True).data,
             'top_steals_per_game': PlayerSerializer(top_steals_per_game, many=True).data,
+            'fairness_adjusted': use_fairness_adjusted,
         }
 
         return Response(data)
@@ -263,18 +276,30 @@ class TopPlayoffsPlayersViewSet(viewsets.ViewSet):
 
     def list(self, request):
         season_number = request.query_params.get('season', 1)
+        use_fairness_adjusted = request.query_params.get('fairness_adjusted', 'true').lower() == 'true'
+        
         if season_number:
             players = Player.objects.filter(season__number=season_number)
         else:
             players = Player.objects.all()
 
         # Sort players based on different statistics using lambda functions
-        top_points_per_game = sorted(players, key=lambda p: -p.average_playoff_points_per_game)[:10]
-        top_rebounds_per_game = sorted(players, key=lambda p: -p.average_playoff_rebounds_per_game)[:10]
-        top_assists_per_game = sorted(players, key=lambda p: -p.average_playoff_assists_per_game)[:10]
-        top_three_points_made = sorted(players, key=lambda p: -p.total_playoff_three_point_fg)[:10]
-        top_blocks_per_game = sorted(players, key=lambda p: -p.average_playoff_blocks_per_game)[:10]
-        top_steals_per_game = sorted(players, key=lambda p: -p.average_playoff_steals_per_game)[:10]
+        if use_fairness_adjusted:
+            # Use fairness-adjusted playoff statistics that consider team's total playoff games played
+            top_points_per_game = sorted(players, key=lambda p: -p.fairness_adjusted_playoff_points_per_game)[:10]
+            top_rebounds_per_game = sorted(players, key=lambda p: -p.fairness_adjusted_playoff_rebounds_per_game)[:10]
+            top_assists_per_game = sorted(players, key=lambda p: -p.fairness_adjusted_playoff_assists_per_game)[:10]
+            top_three_points_made = sorted(players, key=lambda p: -p.total_playoff_three_point_fg)[:10]  # Total playoff 3PM doesn't need adjustment
+            top_blocks_per_game = sorted(players, key=lambda p: -p.fairness_adjusted_playoff_blocks_per_game)[:10]
+            top_steals_per_game = sorted(players, key=lambda p: -p.fairness_adjusted_playoff_steals_per_game)[:10]
+        else:
+            # Use original playoff per-game statistics (player's playoff games played only)
+            top_points_per_game = sorted(players, key=lambda p: -p.average_playoff_points_per_game)[:10]
+            top_rebounds_per_game = sorted(players, key=lambda p: -p.average_playoff_rebounds_per_game)[:10]
+            top_assists_per_game = sorted(players, key=lambda p: -p.average_playoff_assists_per_game)[:10]
+            top_three_points_made = sorted(players, key=lambda p: -p.total_playoff_three_point_fg)[:10]
+            top_blocks_per_game = sorted(players, key=lambda p: -p.average_playoff_blocks_per_game)[:10]
+            top_steals_per_game = sorted(players, key=lambda p: -p.average_playoff_steals_per_game)[:10]
 
         data = {
             'top_points_per_game': PlayerPlayoffsSerializer(top_points_per_game, many=True).data,
@@ -283,6 +308,7 @@ class TopPlayoffsPlayersViewSet(viewsets.ViewSet):
             'top_three_points_made': PlayerPlayoffsSerializer(top_three_points_made, many=True).data,
             'top_blocks_per_game': PlayerPlayoffsSerializer(top_blocks_per_game, many=True).data,
             'top_steals_per_game': PlayerPlayoffsSerializer(top_steals_per_game, many=True).data,
+            'fairness_adjusted': use_fairness_adjusted,
         }
 
         return Response(data)

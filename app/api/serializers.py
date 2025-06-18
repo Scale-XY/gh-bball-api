@@ -69,6 +69,17 @@ class PlayerSerializer(serializers.ModelSerializer):
     average_blocks_per_game = serializers.SerializerMethodField()
     average_steals_per_game = serializers.SerializerMethodField()
 
+    # Fairness-adjusted statistics
+    fairness_adjusted_points_per_game = serializers.SerializerMethodField()
+    fairness_adjusted_rebounds_per_game = serializers.SerializerMethodField()
+    fairness_adjusted_assists_per_game = serializers.SerializerMethodField()
+    fairness_adjusted_blocks_per_game = serializers.SerializerMethodField()
+    fairness_adjusted_steals_per_game = serializers.SerializerMethodField()
+    
+    # Team games information
+    team_total_regular_season_games = serializers.SerializerMethodField()
+    games_played_ratio = serializers.SerializerMethodField()
+
     team = TeamSerializer()
 
     class Meta:
@@ -78,7 +89,11 @@ class PlayerSerializer(serializers.ModelSerializer):
                   'total_points', 'total_rebounds', 'total_assists', 'total_steals',
                   'total_blocks', 'total_fouls',
                   'average_points_per_game', 'average_rebounds_per_game', 'average_assists_per_game',
-                  'average_blocks_per_game', 'average_steals_per_game', 'season',
+                  'average_blocks_per_game', 'average_steals_per_game',
+                  'fairness_adjusted_points_per_game', 'fairness_adjusted_rebounds_per_game',
+                  'fairness_adjusted_assists_per_game', 'fairness_adjusted_blocks_per_game',
+                  'fairness_adjusted_steals_per_game', 'team_total_regular_season_games',
+                  'games_played_ratio', 'season',
                   'total_fg_made', 'total_fg_attempted',
                   'fg_percentage', 'two_point_percentage',
                   'three_point_percentage', 'free_throw_percentage',
@@ -144,6 +159,27 @@ class PlayerSerializer(serializers.ModelSerializer):
     def get_free_throw_percentage(self, obj):
         return obj.free_throw_percentage
 
+    def get_fairness_adjusted_points_per_game(self, obj):
+        return obj.fairness_adjusted_points_per_game
+
+    def get_fairness_adjusted_rebounds_per_game(self, obj):
+        return obj.fairness_adjusted_rebounds_per_game
+
+    def get_fairness_adjusted_assists_per_game(self, obj):
+        return obj.fairness_adjusted_assists_per_game
+
+    def get_fairness_adjusted_blocks_per_game(self, obj):
+        return obj.fairness_adjusted_blocks_per_game
+
+    def get_fairness_adjusted_steals_per_game(self, obj):
+        return obj.fairness_adjusted_steals_per_game
+
+    def get_team_total_regular_season_games(self, obj):
+        return obj.team_total_regular_season_games
+
+    def get_games_played_ratio(self, obj):
+        return obj.games_played_ratio
+
 class PlayerPlayoffsSerializer(serializers.ModelSerializer):
     total_playoff_two_point_fg = serializers.SerializerMethodField()
     total_playoff_three_point_fg = serializers.SerializerMethodField()
@@ -161,6 +197,17 @@ class PlayerPlayoffsSerializer(serializers.ModelSerializer):
     average_playoff_blocks_per_game = serializers.SerializerMethodField()
     average_playoff_steals_per_game = serializers.SerializerMethodField()
 
+    # Fairness-adjusted playoff statistics
+    fairness_adjusted_playoff_points_per_game = serializers.SerializerMethodField()
+    fairness_adjusted_playoff_rebounds_per_game = serializers.SerializerMethodField()
+    fairness_adjusted_playoff_assists_per_game = serializers.SerializerMethodField()
+    fairness_adjusted_playoff_blocks_per_game = serializers.SerializerMethodField()
+    fairness_adjusted_playoff_steals_per_game = serializers.SerializerMethodField()
+    
+    # Team playoff games information
+    team_total_playoff_games = serializers.SerializerMethodField()
+    playoff_games_played_ratio = serializers.SerializerMethodField()
+
     team = TeamSerializer()
 
     class Meta:
@@ -170,7 +217,11 @@ class PlayerPlayoffsSerializer(serializers.ModelSerializer):
                   'total_playoff_points', 'total_playoff_rebounds', 'total_playoff_assists', 'total_playoff_steals',
                   'total_playoff_blocks', 'total_playoff_fouls',
                   'average_playoff_points_per_game', 'average_playoff_rebounds_per_game', 'average_playoff_assists_per_game',
-                  'average_playoff_blocks_per_game', 'average_playoff_steals_per_game', 'season']
+                  'average_playoff_blocks_per_game', 'average_playoff_steals_per_game',
+                  'fairness_adjusted_playoff_points_per_game', 'fairness_adjusted_playoff_rebounds_per_game',
+                  'fairness_adjusted_playoff_assists_per_game', 'fairness_adjusted_playoff_blocks_per_game',
+                  'fairness_adjusted_playoff_steals_per_game', 'team_total_playoff_games',
+                  'playoff_games_played_ratio', 'season']
 
     def get_total_playoff_two_point_fg(self, obj):
         return obj.total_playoff_two_point_fg
@@ -213,6 +264,27 @@ class PlayerPlayoffsSerializer(serializers.ModelSerializer):
 
     def get_average_playoff_steals_per_game(self, obj):
         return obj.average_playoff_steals_per_game
+
+    def get_fairness_adjusted_playoff_points_per_game(self, obj):
+        return obj.fairness_adjusted_playoff_points_per_game
+
+    def get_fairness_adjusted_playoff_rebounds_per_game(self, obj):
+        return obj.fairness_adjusted_playoff_rebounds_per_game
+
+    def get_fairness_adjusted_playoff_assists_per_game(self, obj):
+        return obj.fairness_adjusted_playoff_assists_per_game
+
+    def get_fairness_adjusted_playoff_blocks_per_game(self, obj):
+        return obj.fairness_adjusted_playoff_blocks_per_game
+
+    def get_fairness_adjusted_playoff_steals_per_game(self, obj):
+        return obj.fairness_adjusted_playoff_steals_per_game
+
+    def get_team_total_playoff_games(self, obj):
+        return obj.team_total_playoff_games
+
+    def get_playoff_games_played_ratio(self, obj):
+        return obj.playoff_games_played_ratio
 
 class GameSerializer(serializers.ModelSerializer):
     home_team = TeamSerializer()

@@ -1,6 +1,6 @@
 # models.py
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Sum, Q
 
 def get_default_season_id():
     # Get the first season or create a new one if none exists
@@ -29,6 +29,23 @@ class Team(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def total_games_played(self):
+        """Get the total number of games this team has played (both home and away)"""
+        return self.home_games.count() + self.away_games.count()
+
+    @property
+    def total_regular_season_games_played(self):
+        """Get the total number of regular season games this team has played"""
+        return (self.home_games.filter(playoff_game__isnull=True).count() + 
+                self.away_games.filter(playoff_game__isnull=True).count())
+
+    @property
+    def total_playoff_games_played(self):
+        """Get the total number of playoff games this team has played"""
+        return (self.home_games.filter(playoff_game__isnull=False).count() + 
+                self.away_games.filter(playoff_game__isnull=False).count())
 
 class Game(models.Model):
     QUARTER_FINAL_1 = 'QF1'
@@ -111,6 +128,10 @@ class Player(models.Model):
     @property
     def total_free_throw_fg(self):
         return self._aggregate_statistics('free_throw_fg')
+
+    @property
+    def total_free_throw_attempts(self):
+        return self._aggregate_statistics('free_throw_attempts')
 
     @property
     def total_points(self):
@@ -288,9 +309,120 @@ class Player(models.Model):
 
     @property
     def free_throw_percentage(self):
-        made = self.total_free_throw_fg
-        attempts = self._aggregate_statistics('free_throw_attempts')
-        return round((made / attempts) * 100, 1) if attempts else 0.0
+        if self.total_free_throw_attempts > 0:
+            return round((self.total_free_throw_fg / self.total_free_throw_attempts) * 100, 1)
+        return 0
+
+    # Fairness-adjusted statistics that consider team's total games played
+    @property
+    def team_total_regular_season_games(self):
+        """Get the total number of regular season games the player's team has played"""
+        return self.team.total_regular_season_games_played
+
+    @property
+    def team_total_playoff_games(self):
+        """Get the total number of playoff games the player's team has played"""
+        return self.team.total_playoff_games_played
+
+    @property
+    def games_played_ratio(self):
+        """Get the ratio of games the player played vs team's total games"""
+        player_games = self._get_statistics().count()
+        team_games = self.team_total_regular_season_games
+        if team_games > 0:
+            return player_games / team_games
+        return 0
+
+    @property
+    def playoff_games_played_ratio(self):
+        """Get the ratio of playoff games the player played vs team's total playoff games"""
+        player_playoff_games = self._get_statistics(playoff=True).count()
+        team_playoff_games = self.team_total_playoff_games
+        if team_playoff_games > 0:
+            return player_playoff_games / team_playoff_games
+        return 0
+
+    # Fairness-adjusted per-game statistics
+    @property
+    def fairness_adjusted_points_per_game(self):
+        """Points per game adjusted for team's total games played"""
+        team_games = self.team_total_regular_season_games
+        if team_games > 0:
+            return round(self.total_points / team_games, 1)
+        return 0
+
+    @property
+    def fairness_adjusted_rebounds_per_game(self):
+        """Rebounds per game adjusted for team's total games played"""
+        team_games = self.team_total_regular_season_games
+        if team_games > 0:
+            return round(self.total_rebounds / team_games, 1)
+        return 0
+
+    @property
+    def fairness_adjusted_assists_per_game(self):
+        """Assists per game adjusted for team's total games played"""
+        team_games = self.team_total_regular_season_games
+        if team_games > 0:
+            return round(self.total_assists / team_games, 1)
+        return 0
+
+    @property
+    def fairness_adjusted_blocks_per_game(self):
+        """Blocks per game adjusted for team's total games played"""
+        team_games = self.team_total_regular_season_games
+        if team_games > 0:
+            return round(self.total_blocks / team_games, 1)
+        return 0
+
+    @property
+    def fairness_adjusted_steals_per_game(self):
+        """Steals per game adjusted for team's total games played"""
+        team_games = self.team_total_regular_season_games
+        if team_games > 0:
+            return round(self.total_steals / team_games, 1)
+        return 0
+
+    # Playoff fairness-adjusted statistics
+    @property
+    def fairness_adjusted_playoff_points_per_game(self):
+        """Playoff points per game adjusted for team's total playoff games played"""
+        team_playoff_games = self.team_total_playoff_games
+        if team_playoff_games > 0:
+            return round(self.total_playoff_points / team_playoff_games, 1)
+        return 0
+
+    @property
+    def fairness_adjusted_playoff_rebounds_per_game(self):
+        """Playoff rebounds per game adjusted for team's total playoff games played"""
+        team_playoff_games = self.team_total_playoff_games
+        if team_playoff_games > 0:
+            return round(self.total_playoff_rebounds / team_playoff_games, 1)
+        return 0
+
+    @property
+    def fairness_adjusted_playoff_assists_per_game(self):
+        """Playoff assists per game adjusted for team's total playoff games played"""
+        team_playoff_games = self.team_total_playoff_games
+        if team_playoff_games > 0:
+            return round(self.total_playoff_assists / team_playoff_games, 1)
+        return 0
+
+    @property
+    def fairness_adjusted_playoff_blocks_per_game(self):
+        """Playoff blocks per game adjusted for team's total playoff games played"""
+        team_playoff_games = self.team_total_playoff_games
+        if team_playoff_games > 0:
+            return round(self.total_playoff_blocks / team_playoff_games, 1)
+        return 0
+
+    @property
+    def fairness_adjusted_playoff_steals_per_game(self):
+        """Playoff steals per game adjusted for team's total playoff games played"""
+        team_playoff_games = self.team_total_playoff_games
+        if team_playoff_games > 0:
+            return round(self.total_playoff_steals / team_playoff_games, 1)
+        return 0
 
 
 class PlayerStatistics(models.Model):
