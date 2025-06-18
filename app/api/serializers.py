@@ -10,9 +10,31 @@ class SeasonSerializer(serializers.ModelSerializer):
         fields = ['number']
 
 class TeamSerializer(serializers.ModelSerializer):
+    total_games_played = serializers.SerializerMethodField()
+    total_regular_season_games_played = serializers.SerializerMethodField()
+    total_playoff_games_played = serializers.SerializerMethodField()
+    win_percentage = serializers.SerializerMethodField()
+    
     class Meta:
         model = Team
-        fields = '__all__'
+        fields = ['id', 'name', 'hex_color', 'wins', 'losses', 'logo_url', 'season',
+                  'total_games_played', 'total_regular_season_games_played', 
+                  'total_playoff_games_played', 'win_percentage']
+
+    def get_total_games_played(self, obj):
+        return obj.total_games_played
+
+    def get_total_regular_season_games_played(self, obj):
+        return obj.total_regular_season_games_played
+
+    def get_total_playoff_games_played(self, obj):
+        return obj.total_playoff_games_played
+
+    def get_win_percentage(self, obj):
+        total_games = obj.wins + obj.losses
+        if total_games > 0:
+            return round((obj.wins / total_games) * 100, 1)
+        return 0.0
 
 class PlayerDetailSerializer(serializers.ModelSerializer):
 
@@ -399,3 +421,47 @@ class PlayerCSVSerializer(serializers.Serializer):
     position = serializers.CharField()
     team = serializers.CharField()
     jersey_number = serializers.IntegerField()
+
+class TeamStandingsSerializer(serializers.ModelSerializer):
+    total_games_played = serializers.SerializerMethodField()
+    total_regular_season_games_played = serializers.SerializerMethodField()
+    total_playoff_games_played = serializers.SerializerMethodField()
+    win_percentage = serializers.SerializerMethodField()
+    head_to_head_records = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Team
+        fields = ['id', 'name', 'hex_color', 'wins', 'losses', 'logo_url', 'season',
+                  'total_games_played', 'total_regular_season_games_played', 
+                  'total_playoff_games_played', 'win_percentage', 'head_to_head_records']
+
+    def get_total_games_played(self, obj):
+        return obj.total_games_played
+
+    def get_total_regular_season_games_played(self, obj):
+        return obj.total_regular_season_games_played
+
+    def get_total_playoff_games_played(self, obj):
+        return obj.total_playoff_games_played
+
+    def get_win_percentage(self, obj):
+        total_games = obj.wins + obj.losses
+        if total_games > 0:
+            return round((obj.wins / total_games) * 100, 1)
+        return 0.0
+
+    def get_head_to_head_records(self, obj):
+        """Get head-to-head records against all other teams in the same season"""
+        season_teams = Team.objects.filter(season=obj.season).exclude(id=obj.id)
+        records = {}
+        
+        for other_team in season_teams:
+            wins, losses = obj.get_head_to_head_record(other_team)
+            if wins > 0 or losses > 0:  # Only include teams they've played against
+                records[other_team.name] = {
+                    'wins': wins,
+                    'losses': losses,
+                    'win_percentage': obj.get_head_to_head_win_percentage(other_team)
+                }
+        
+        return records

@@ -47,6 +47,39 @@ class Team(models.Model):
         return (self.home_games.filter(playoff_game__isnull=False).count() + 
                 self.away_games.filter(playoff_game__isnull=False).count())
 
+    def get_head_to_head_record(self, other_team):
+        """Get the head-to-head record against another team (wins, losses)"""
+        if self == other_team:
+            return (0, 0)
+        
+        # Count games where this team won against the other team
+        wins = (self.home_games.filter(away_team=other_team, winner=self).count() + 
+                self.away_games.filter(home_team=other_team, winner=self).count())
+        
+        # Count games where this team lost against the other team
+        losses = (self.home_games.filter(away_team=other_team, winner=other_team).count() + 
+                  self.away_games.filter(home_team=other_team, winner=other_team).count())
+        
+        return (wins, losses)
+
+    def get_head_to_head_wins(self, other_team):
+        """Get the number of wins against another team"""
+        wins, _ = self.get_head_to_head_record(other_team)
+        return wins
+
+    def get_head_to_head_losses(self, other_team):
+        """Get the number of losses against another team"""
+        _, losses = self.get_head_to_head_record(other_team)
+        return losses
+
+    def get_head_to_head_win_percentage(self, other_team):
+        """Get the win percentage against another team"""
+        wins, losses = self.get_head_to_head_record(other_team)
+        total_games = wins + losses
+        if total_games > 0:
+            return wins / total_games
+        return 0.0
+
 class Game(models.Model):
     QUARTER_FINAL_1 = 'QF1'
     QUARTER_FINAL_2 = 'QF2'

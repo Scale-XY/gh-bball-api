@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from .models import Season, Team, Player, Game, PlayerStatistics
 from .serializers import TeamDetailSerializer, TeamSerializer, PlayerSerializer, GameSerializer, GameWithStatsSerializer
 from .serializers import PlayerStatisticsSerializer, PlayerCSVSerializer, TeamWithGamesSerializer
-from .serializers import PlayerPlayoffsSerializer
+from .serializers import PlayerPlayoffsSerializer, TeamStandingsSerializer
 from rest_framework.decorators import action
 
 from django.db import transaction
@@ -94,12 +94,41 @@ class TeamViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         season_number = self.request.query_params.get('season', 1)
         if season_number:
-            return Team.objects.filter(season__number=season_number).distinct().order_by('-wins', 'losses')
-        return Team.objects.all().order_by('-wins', 'losses')
+            teams = Team.objects.filter(season__number=season_number).distinct()
+        else:
+            teams = Team.objects.all()
+        
+        # Sort teams with head-to-head tiebreaker
+        return sorted(teams, key=lambda team: self._get_team_sort_key(team, teams), reverse=True)
+
+    def _get_team_sort_key(self, team, all_teams):
+        """
+        Create a sort key for a team that considers:
+        1. Wins (primary)
+        2. Losses (secondary, lower is better)
+        3. Head-to-head record against tied teams (tiebreaker)
+        """
+        # Primary sort: wins (higher is better)
+        wins = team.wins
+        
+        # Secondary sort: losses (lower is better, so we negate it)
+        losses = -team.losses
+        
+        # Find teams with the same win-loss record for head-to-head comparison
+        tied_teams = [t for t in all_teams if t.wins == team.wins and t.losses == team.losses and t != team]
+        
+        # Calculate head-to-head wins against tied teams
+        head_to_head_wins = sum(team.get_head_to_head_wins(tied_team) for tied_team in tied_teams)
+        
+        # Return a tuple for sorting: (wins, -losses, head_to_head_wins)
+        # This ensures teams are sorted by wins first, then by fewer losses, then by head-to-head wins
+        return (wins, losses, head_to_head_wins)
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return TeamDetailSerializer
+        elif self.action == 'list':
+            return TeamStandingsSerializer
         return TeamWithGamesSerializer
     
 class PlayerViewSet(viewsets.ModelViewSet):
