@@ -263,7 +263,7 @@ class TopPlayersViewSet(viewsets.ViewSet):
 
     def list(self, request):
         season_number = request.query_params.get('season', 1)
-        use_fairness_adjusted = request.query_params.get('fairness_adjusted', 'true').lower() == 'true'
+        use_fairness_adjusted = request.query_params.get('fairness_adjusted', 'false').lower() == 'true'
         
         if season_number:
             players = Player.objects.filter(season__number=season_number)  # Filter by season
